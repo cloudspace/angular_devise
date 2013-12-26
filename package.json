@@ -1,0 +1,35 @@
+{
+    "name": "AngularDevise",
+    "version": "0.0.1",
+    "description": "A small AngularJS Service to interact with Devise Authentication.",
+    "main": "lib/devise.js",
+    "scripts": {
+        "test": "grunt test"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/cloudspace/angular_devise.git"
+    },
+    "keywords": [
+        "Angular",
+        "AngularJS",
+        "Devise"
+    ],
+    "author": "Justin Ridgewell",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/cloudspace/angular_devise/issues"
+    },
+    "dependencies": {},
+    "devDependencies": {
+        "grunt": "~0.4.1",
+        "grunt-ngmin": "~0.0.2",
+        "grunt-plato": "~0.2.1",
+        "grunt-preprocess": "~2.3.0",
+        "grunt-contrib-jshint": "~0.6.2",
+        "grunt-contrib-uglify": "~0.2.2",
+        "grunt-karma": "~0.6.2",
+        "load-grunt-tasks": "~0.2.0",
+        "time-grunt": "~0.2.1"
+    }
+}
