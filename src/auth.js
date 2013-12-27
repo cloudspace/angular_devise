@@ -21,7 +21,6 @@ devise.provider('Auth', function AuthProvider() {
 
     /**
      * The default paths.
-     * TODO: Mention in login/logout/register that path is configurable.
      */
     var paths = {
         login: '/users/sign_in.json',
@@ -31,7 +30,6 @@ devise.provider('Auth', function AuthProvider() {
 
     /**
      * The default HTTP methods to use.
-     * TODO: Mention in login/logout/register that method is configurable.
      */
     var methods = {
         login: 'POST',
@@ -169,7 +167,7 @@ devise.provider('Auth', function AuthProvider() {
              *  2. Auth has not authenticated a user but the server has an
              *      authenticated session, Auth will attempt to retrieve that
              *      session and resolve with its user.
-             *  3. Neither Auth nor the server has an authenticated server,
+             *  3. Neither Auth nor the server has an authenticated session,
              *      and will reject with an unauthenticated error.
              *
              * @returns {Promise} A $http promise that will be resolved or
