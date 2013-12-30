@@ -1,4 +1,4 @@
-AngularDevise
+AngularDevise [![Build Status](https://travis-ci.org/cloudspace/angular_devise.png)](http://travis-ci.org/cloudspace/angular_devise)
 =============
 
 A small AngularJS Service to interact with Devise Authentication.
@@ -23,12 +23,12 @@ Downloading
 
 AngularDevise is registered as `angular-devise` in
 [bower](http://sindresorhus.com/bower-components/#!/search/angular-devise).
-Use either `angular-devise/lib/devise.js` or
-`angular-devise/lib/devise-min.js`
 
 ```bash
 bower install --save angular-devise
 ```
+
+You can then use the main file at `angular-devise/lib/devise-min.js`.
 
 
 Usage
@@ -52,7 +52,7 @@ angular.module('myModule', ['Devise']).
 `Auth.currentUser()` returns a promise that will be resolved into the
 currentUser. There are three possible outcomes:
 
- 1. Auth has authenticated a user, and will resolve with it
+ 1. Auth has authenticated a user, and will resolve with that user.
  2. Auth has not authenticated a user but the server has a previously
     authenticated session, Auth will attempt to retrieve that session
     and resolve with its user.
@@ -253,3 +253,12 @@ angular.module('myModule', ['Devise']).
         });
     });
 ```
+
+
+Credits
+-------
+
+[![Cloudspace](http://cloudspace.com/assets/images/logo.png)](http://cloudspace.com/)
+
+AngularDevise is maintained by [Cloudspace](http://cloudspace.com/), and
+is distributed under the [MIT License](/LICENSE.md).
