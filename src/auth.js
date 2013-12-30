@@ -17,6 +17,24 @@ devise.provider('Auth', function AuthProvider() {
         register: 'POST'
     };
 
+    /**
+     * The parsing function used to turn a $http
+     * response into a "user".
+     *
+     * Can be swapped with another parsing function
+     * using
+     *
+     *  angular.module('myModule', ['Devise']).
+     *  config(function(AuthProvider) {
+     *      AuthProvider.parse(function(response) {
+     *          return new User(response.data);
+     *      });
+     *  });
+     */
+    var parse = function(response) {
+        return response.data;
+    };
+
     // A helper function that will get the
     // proper method.
     function method(action) {
@@ -45,7 +63,43 @@ devise.provider('Auth', function AuthProvider() {
     configure.call(this, methods, 'Method');
     configure.call(this, paths, 'Path');
 
+    // The parse configure function.
+    this.parse = function(fn) {
+        if (typeof fn !== 'function') {
+            return parse;
+        }
+        parse = fn;
+        return this;
+    };
+
+    // A cached slice
+    var slice = Array.prototype.slice;
+    // A simplified partial function.
+    // Ignores arguments to the returned partial
+    function partial(fn) {
+        var args = slice.call(arguments, 1);
+        return function() {
+            return fn.apply(this, args);
+        };
+    }
+    // Creates a function that always
+    // returns a given arg.
+    function constant(arg) {
+        return function() {
+            return arg;
+        };
+    }
+
     this.$get = function($q, $http) {
+        // Our shared save function, called
+        // by `then`s. Will return the first argument,
+        // unless it is falsey (then it'll return
+        // the second).
+        function save(user) {
+            service.currentUser = user;
+            return user;
+        }
+
         var service = {
             /**
              * The Auth service's current user.
@@ -75,10 +129,7 @@ devise.provider('Auth', function AuthProvider() {
              */
             login: function(creds) {
                 creds = creds || {};
-                return $http[method('login')](path('login'), {user: creds}).then(function(response) {
-                    service._currentUser = response.data;
-                    return service.currentUser();
-                });
+                return $http[method('login')](path('login'), {user: creds}).then(parse).then(save);
             },
 
             /**
@@ -97,11 +148,8 @@ devise.provider('Auth', function AuthProvider() {
              *                  rejected by the server.
              */
             logout: function() {
-                return $http[method('logout')](path('logout')).then(function() {
-                    var oldUser = service._currentUser;
-                    service._currentUser = null;
-                    return oldUser;
-                });
+                var oldUser = constant(service._currentUser);
+                return $http[method('logout')](path('logout')).then(partial(save, null)).then(oldUser);
             },
 
             /**
@@ -125,10 +173,7 @@ devise.provider('Auth', function AuthProvider() {
              */
             register: function(creds) {
                 creds = creds || {};
-                return $http[method('register')](path('register'), {user: creds}).then(function(response) {
-                    service._currentUser = response.data;
-                    return service.currentUser();
-                });
+                return $http[method('register')](path('register'), {user: creds}).then(parse).then(save);
             },
 
             /**

@@ -71,6 +71,30 @@ describe('Provider: Devise.Auth', function () {
         it('.registerMethod', function() {
             testPathConfigure('register', 'GET', true);
         });
+
+        it('.parse', function() {
+            initService(function() {
+                AuthProvider.parse(function(response) {
+                    return new User(response.data);
+                });
+            });
+            var User = function(params) {
+                this.params = params;
+            };
+            var params = {id: 1, name: 'test', email: 'test@email.com', password: 'password'};
+            var callCount = 0;
+            var callback = function(user) {
+                ++callCount;
+                expect(user instanceof User).toBe(true);
+                expect(user.params).toEqual(params);
+            };
+            $httpBackend.expect('POST', '/users/sign_in.json').respond(params);
+
+            Auth.login().then(callback);
+            $httpBackend.flush();
+
+            expect(callCount).toBe(1);
+        });
     });
 
     describe('.login', function() {
