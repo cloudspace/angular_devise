@@ -96,7 +96,7 @@ devise.provider('Auth', function AuthProvider() {
         // unless it is falsey (then it'll return
         // the second).
         function save(user) {
-            service.currentUser = user;
+            service._currentUser = user;
             return user;
         }
 
