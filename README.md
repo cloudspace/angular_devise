@@ -51,7 +51,7 @@ angular.module('myModule', ['Devise']).
 `Auth._currentUser` will be either `null` or the currentUser's
 object representation. It is not recommended to directly access
 `Auth._currentUser`, but instead use
-[Auth.currentUser()](authcurrentuser).
+[Auth.currentUser()](#authcurrentuser).
 
 ```javascript
 angular.module('myModule', ['Devise']).
