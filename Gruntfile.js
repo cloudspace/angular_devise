@@ -64,12 +64,12 @@ module.exports = function(grunt) {
         karma: {
             options: {
                 configFile: 'karma.conf.js',
+                browsers: ['PhantomJS']
             },
             unit: {
             },
             continuous: {
-                singleRun: false,
-                browsers: ['PhantomJS']
+                singleRun: false
             }
         }
     });
