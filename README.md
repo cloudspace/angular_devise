@@ -212,11 +212,11 @@ Configuration
 -------------
 
 By default, AngularDevise uses the following HTTP methods/paths:
- - login: POST /users/sign_in.json
- - logout: DELETE /users/sign_out.json
- - register: POST /users.json
+ - **login**: POST /users/sign_in.json
+ - **logout**: DELETE /users/sign_out.json
+ - **register**: POST /users.json
 
-All of this can be configured using a `.config` block in your module.
+All of these can be configured using a `.config` block in your module.
 
 ```javascript
 angular.module('myModule', ['Devise']).
