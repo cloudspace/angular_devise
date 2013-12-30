@@ -1,24 +1,4 @@
 devise.provider('Auth', function AuthProvider() {
-    // Cache a reference to slice.
-    var slice = Array.prototype.slice;
-
-    /**
-     * Picks properties out of an object.
-     * @param {Object} obj The object to pick out of.
-     * @param {...String} props The properties to pick out.
-     */
-    function pick(old) {
-        var obj = {};
-        if (!old) { return obj; }
-        var props = slice.call(arguments, 1);
-        var l = props.length;
-        var prop;
-        while ((prop = props[--l])) {
-            if (prop in old) { obj[prop] = old[prop]; }
-        }
-        return obj;
-    }
-
     /**
      * The default paths.
      */
@@ -89,15 +69,13 @@ devise.provider('Auth', function AuthProvider() {
              *      AuthProvider.loginMethod('GET');
              *  });
              *
-             * @param {Object} [opts] A hash of user credentials.
-             * @param {String} [opts.email] The email of the user
-             * @param {String} [opts.password] The password of the user
+             * @param {Object} [creds] A hash of user credentials.
              * @returns {Promise} A $http promise that will be resolved or
              *                  rejected by the server.
              */
-            login: function(opts) {
-                var user = pick(opts, 'email', 'password');
-                return $http[method('login')](path('login'), {user: user}).then(function(response) {
+            login: function(creds) {
+                creds = creds || {};
+                return $http[method('login')](path('login'), {user: creds}).then(function(response) {
                     service.currentUser = response.data;
                     return service.requestCurrentUser();
                 });
@@ -141,20 +119,13 @@ devise.provider('Auth', function AuthProvider() {
              *      AuthProvider.registerMethod('GET');
              *  });
              *
-             * @param {Object} [opts] A hash of user credentials.
-             * @param {String} [opts.email] The email of the user
-             * @param {String} [opts.password] The password of the user
-             * @param {String} [opts.password_confirmation] The retyped password.
-             *                  Will default to opts.password if none is given.
+             * @param {Object} [creds] A hash of user credentials.
              * @returns {Promise} A $http promise that will be resolved or
              *                  rejected by the server.
              */
-            register: function(opts) {
-                var user = pick(opts, 'email', 'password', 'password_confirmation');
-                if (!user.password_confirmation) {
-                    user.password_confirmation = user.password;
-                }
-                return $http[method('register')](path('register'), {user: user}).then(function(response) {
+            register: function(creds) {
+                creds = creds || {};
+                return $http[method('register')](path('register'), {user: creds}).then(function(response) {
                     service.currentUser = response.data;
                     return service.requestCurrentUser();
                 });

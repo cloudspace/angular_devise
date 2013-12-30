@@ -99,17 +99,8 @@ describe('Provider: Devise.Auth', function () {
             $httpBackend.flush();
         });
 
-        it('POSTS user.email data', function() {
-            var u = {email: 'test'};
-            postCallback = function(data) {
-                return jsonEquals(data.user, u);
-            };
-            Auth.login(u);
-            $httpBackend.flush();
-        });
-
-        it('POSTS user.password data', function() {
-            var u = {password: 'test'};
+        it('POSTS credential data', function() {
+            var u = {email: 'test', blah: true};
             postCallback = function(data) {
                 return jsonEquals(data.user, u);
             };
@@ -192,37 +183,10 @@ describe('Provider: Devise.Auth', function () {
             $httpBackend.flush();
         });
 
-        it('POSTS user.email data', function() {
-            var u = {email: 'test'};
+        it('POSTS credential data', function() {
+            var u = {email: 'test', blah: true};
             postCallback = function(data) {
                 return jsonEquals(data.user, u);
-            };
-            Auth.register(u);
-            $httpBackend.flush();
-        });
-
-        it('POSTS user.password data', function() {
-            var u = {password: 'test'};
-            postCallback = function(data) {
-                return data.user.password === u.password;
-            };
-            Auth.register(u);
-            $httpBackend.flush();
-        });
-
-        it('POSTS user.password_confirmation data', function() {
-            var u = {password_confirmation: 'test'};
-            postCallback = function(data) {
-                return jsonEquals(data.user, u);
-            };
-            Auth.register(u);
-            $httpBackend.flush();
-        });
-
-        it('POSTS user.password_confirmation from user.password if password_confirmation not set', function() {
-            var u = {password: 'test'};
-            postCallback = function(data) {
-                return data.user.password_confirmation === data.user.password;
             };
             Auth.register(u);
             $httpBackend.flush();

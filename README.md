@@ -106,13 +106,13 @@ angular.module('myModule', ['Devise']).
     });
 ```
 
-### Auth.login(opts)
+### Auth.login(creds)
 
 Use `Auth.login()` to authenticate with the server. Keep in mind,
 credentials are sent in plaintext; use a SSL connection to secure them.
-`opts` is an object which should contain the email and password of the
-user trying to login. `Auth.login()` will return a promise that will resolve
-to the logged-in user.
+`creds` is an object which should contain any credentials needed to
+authenticate with the server. `Auth.login()` will return a promise that
+will resolve to the logged-in user.
 
 ```javascript
 angular.module('myModule', ['Devise']).
@@ -123,7 +123,7 @@ angular.module('myModule', ['Devise']).
         };
 
         Auth.login(credentials).then(function(user) {
-            // You have a user!
+            console.log(user); // => {id: 1, ect: '...'}
         }, function(error) {
             // Authentication failed...
         });
@@ -153,6 +153,8 @@ angular.module('myModule', ['Devise']).
         // ...
         Auth.logout().then(function(oldUser) {
             // alert(oldUser.name + "you're signed out now.");
+        }, function(error) {
+            // An error occurred logging out.
         });
     });
 ```
@@ -168,15 +170,13 @@ angular.module('myModule', ['Devise']).
     });
 ```
 
-### Auth.register(opts)
+### Auth.register(creds)
 
 Use `Auth.register()` to register and authenticate with the server. Keep
 in mind, credentials are sent in plaintext; use a SSL connection to
-secure them. `opts` is an object that should contain at least an email
-and password. Additionally, `opts.password_confirmation` may be
-provided, though it will default to `opts.password` if it is not.
-`Auth.register()` will return a promise that will resolve to the
-registered user.
+secure them. `creds` is an object that should contain any credentials
+needed to register with the server. `Auth.register()` will return a
+promise that will resolve to the registered user.
 
 ```javascript
 angular.module('myModule', ['Devise']).
@@ -184,12 +184,11 @@ angular.module('myModule', ['Devise']).
         var credentials = {
             email: 'user@domain.com',
             password: 'password1',
-            password_confirmation: 'password1' // though it will default
-                                               // to credentials.password
+            password_confirmation: 'password1'
         };
 
         Auth.register(credentials).then(function(registeredUser) {
-            // Registration successful!
+            console.log(registeredUser); // => {id: 1, ect: '...'}
         }, function(error) {
             // Registration failed...
         });
@@ -197,7 +196,7 @@ angular.module('myModule', ['Devise']).
 ```
 
 By default, `register` will POST to '/users.json'. The path and HTTP
-method used to login are configurable using
+method used to register are configurable using:
 
 ```javascript
 angular.module('myModule', ['Devise']).
