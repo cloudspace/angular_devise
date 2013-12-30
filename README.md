@@ -23,7 +23,8 @@ Downloading
 
 AngularDevise is registered as `angular-devise` in
 [bower](http://sindresorhus.com/bower-components/#!/search/angular-devise).
-Use either `angular-devise/lib/devise.js` or `angular-devise/lib/devise-min.js`
+Use either `angular-devise/lib/devise.js` or
+`angular-devise/lib/devise-min.js`
 
 ```bash
 bower install --save angular-devise
@@ -46,10 +47,35 @@ angular.module('myModule', ['Devise']).
     });
 ```
 
-### Auth._currentUser
+### Auth.currentUser()
 
-`Auth._currentUser` will be either `null` or the currentUser's
-object representation. It is not recommended to directly access
+`Auth.currentUser()` returns a promise that will be resolved into the
+currentUser. There are three possible outcomes:
+
+ 1. Auth has authenticated a user, and will resolve with it
+ 2. Auth has not authenticated a user but the server has a previously
+    authenticated session, Auth will attempt to retrieve that session
+    and resolve with its user.
+ 3. Neither Auth nor the server has an authenticated session, and will
+    reject with an unauthenticated error.
+
+```javascript
+angular.module('myModule', ['Devise']).
+    controller('myCtrl', function(Auth) {
+        Auth.currentUser().then(function(user) {
+            // User was logged in, or Devise returned
+            // previously authenticated session.
+            console.log(user); // => {id: 1, ect: '...'}
+        }, function(error) {
+            // unauthenticated error
+        });
+    });
+```
+
+#### Auth._currentUser
+
+`Auth._currentUser` will be either `null` or the currentUser's object
+representation. It is not recommended to directly access
 `Auth._currentUser`, but instead use
 [Auth.currentUser()](#authcurrentuser).
 
@@ -64,30 +90,6 @@ angular.module('myModule', ['Devise']).
     });
 ```
 
-### Auth.currentUser()
-
-`Auth.currentUser()` returns a promise that will be resolved into
-the currentUser. There are three possible outcomes:
-
- 1. Auth has authenticated a user, and will resolve with it
- 2. Auth has not authenticated a user but the server has a previously
-    authenticated session, Auth will attempt to retrieve that
-    session and resolve with its user.
- 3. Neither Auth nor the server has an authenticated session,
-    and will reject with an unauthenticated error.
-
-```javascript
-angular.module('myModule', ['Devise']).
-    controller('myCtrl', function(Auth) {
-        Auth.currentUser().then(function(user) {
-            // User was logged in, or Devise returned
-            // previously authenticated session.
-            console.log(user); // => {id: 1, ect: '...'}
-        }, function(error) {
-            // unauthenticated error
-        });
-    });
-```
 
 ### Auth.isAuthenticated()
 
@@ -112,8 +114,8 @@ credentials are sent in plaintext; use a SSL connection to secure them.
 `creds` is an object which should contain any credentials needed to
 authenticate with the server. `Auth.login()` will return a promise that
 will resolve to the logged-in user. See
-[AuthProvider.parse()](#authprovider) for parsing the user into a
-usable object.
+[AuthProvider.parse()](#authprovider) for parsing the user into a usable
+object.
 
 ```javascript
 angular.module('myModule', ['Devise']).
@@ -160,8 +162,8 @@ angular.module('myModule', ['Devise']).
     });
 ```
 
-By default, `logout` will DELETE to '/users/sign_out.json'. The path
-and HTTP method used to logout are configurable using:
+By default, `logout` will DELETE to '/users/sign_out.json'. The path and
+HTTP method used to logout are configurable using:
 
 ```javascript
 angular.module('myModule', ['Devise']).
@@ -219,6 +221,7 @@ By default, AngularDevise uses the following HTTP methods/paths:
  - **register**: POST /users.json
 
 And the following parse function:
+
 ```javascript
 function parse(response) {
     var user = response.data;
