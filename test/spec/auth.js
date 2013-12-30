@@ -118,8 +118,6 @@ describe('Provider: Devise.Auth', function () {
             Auth.login().then(callback);
 
             $httpBackend.flush();
-            // use #$apply to have the promise resolve.
-            $rootScope.$apply();
 
             expect(callback).toHaveBeenCalledWith(user);
         });
@@ -150,8 +148,6 @@ describe('Provider: Devise.Auth', function () {
             Auth.logout().then(callback);
 
             $httpBackend.flush();
-            // use #$apply to have the promise resolve.
-            $rootScope.$apply();
 
             expect(callback).toHaveBeenCalledWith(user);
         });
@@ -202,8 +198,6 @@ describe('Provider: Devise.Auth', function () {
             Auth.register().then(callback);
 
             $httpBackend.flush();
-            // use #$apply to have the promise resolve.
-            $rootScope.$apply();
 
             expect(callback).toHaveBeenCalledWith(user);
         });
@@ -256,9 +250,6 @@ describe('Provider: Devise.Auth', function () {
                     Auth.currentUser().then(callback);
                     $httpBackend.flush();
 
-                    // use #$apply to have the promise resolve.
-                    $rootScope.$apply();
-
                     expect(callback).toHaveBeenCalledWith(user);
                 });
             });
@@ -273,9 +264,6 @@ describe('Provider: Devise.Auth', function () {
                     var callback = jasmine.createSpy('callback');
                     Auth.currentUser().catch(callback);
                     $httpBackend.flush();
-
-                    // use #$apply to have the promise resolve.
-                    $rootScope.$apply();
 
                     var call = callback.calls[0];
                     expect(call.args[0].data).toEqual(error);
