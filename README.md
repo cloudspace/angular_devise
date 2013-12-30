@@ -111,7 +111,9 @@ Use `Auth.login()` to authenticate with the server. Keep in mind,
 credentials are sent in plaintext; use a SSL connection to secure them.
 `creds` is an object which should contain any credentials needed to
 authenticate with the server. `Auth.login()` will return a promise that
-will resolve to the logged-in user.
+will resolve to the logged-in user. See
+[AuthProvider.parse()](#authprovider) for parsing the user into a
+usable object.
 
 ```javascript
 angular.module('myModule', ['Devise']).
@@ -175,7 +177,9 @@ Use `Auth.register()` to register and authenticate with the server. Keep
 in mind, credentials are sent in plaintext; use a SSL connection to
 secure them. `creds` is an object that should contain any credentials
 needed to register with the server. `Auth.register()` will return a
-promise that will resolve to the registered user.
+promise that will resolve to the registered user. See
+[AuthProvider.parse()](#authproviderparse) for parsing the user into a
+usable object.
 
 ```javascript
 angular.module('myModule', ['Devise']).
@@ -206,13 +210,21 @@ angular.module('myModule', ['Devise']).
 ```
 
 
-Configuration
--------------
+AuthProvider
+------------
 
 By default, AngularDevise uses the following HTTP methods/paths:
  - **login**: POST /users/sign_in.json
  - **logout**: DELETE /users/sign_out.json
  - **register**: POST /users.json
+
+And the following parse function:
+```javascript
+function parse(response) {
+    var user = response.data;
+    return user;
+}
+```
 
 All of these can be configured using a `.config` block in your module.
 
@@ -230,5 +242,11 @@ angular.module('myModule', ['Devise']).
         // Customise register
         AuthProvider.registerMethod('PATCH');
         AuthProvider.registerPath('/user/sign_up.json');
+
+        // Customize user parsing
+        // NOTE: **MUST** return a truth-y expression
+        AuthProvider.parse(function(response) {
+            return new User(response.data);
+        });
     });
 ```
