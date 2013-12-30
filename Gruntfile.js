@@ -79,7 +79,10 @@ module.exports = function(grunt) {
 
     // Default task.
     grunt.registerTask('lint-test', 'jshint:test');
-    grunt.registerTask('test', 'karma:unit');
+    grunt.registerTask('test', function(type) {
+        type = type || 'unit';
+        grunt.task.run('karma:' + type);
+    });
     grunt.registerTask('travis', ['jshint:devise', 'karma']);
     grunt.registerTask('default', ['jshint:devise', 'test', 'preprocess', 'ngmin', 'uglify']);
 
