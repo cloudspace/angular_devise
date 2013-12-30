@@ -46,46 +46,45 @@ angular.module('myModule', ['Devise']).
     });
 ```
 
-### Auth.currentUser
+### Auth._currentUser
 
-`Auth.currentUser` will contain either `null` or the currentUser's
+`Auth._currentUser` will be either `null` or the currentUser's
 object representation. It is not recommended to directly access
-`Auth.currentUser`, but instead use
-[Auth.requestCurrentUser()](authrequestcurrentuser).
+`Auth._currentUser`, but instead use
+[Auth.currentUser()](authcurrentuser).
 
 ```javascript
 angular.module('myModule', ['Devise']).
     controller('myCtrl', function(Auth) {
-        console.log(Auth.currentUser); // => null
+        console.log(Auth._currentUser); // => null
 
         // Log in user...
 
-        console.log(Auth.currentUser); // => {id: 1, ect: '...'}
+        console.log(Auth._currentUser); // => {id: 1, ect: '...'}
     });
 ```
 
-### Auth.requestCurrentUser()
+### Auth.currentUser()
 
-`Auth.requestCurrentUser()` returns a promise that will be resolved into
+`Auth.currentUser()` returns a promise that will be resolved into
 the currentUser. There are three possible outcomes:
 
-*  1. Auth has authenticated a user, and will resolve with it
-*  2. Auth has not authenticated a user but the server has an
-        authenticated session, Auth will attempt to retrieve that
-        session and resolve with its user.
-*  3. Neither Auth nor the server has an authenticated session,
-        and will reject with an unauthenticated error.
+ 1. Auth has authenticated a user, and will resolve with it
+ 2. Auth has not authenticated a user but the server has a previously
+    authenticated session, Auth will attempt to retrieve that
+    session and resolve with its user.
+ 3. Neither Auth nor the server has an authenticated session,
+    and will reject with an unauthenticated error.
 
 ```javascript
 angular.module('myModule', ['Devise']).
     controller('myCtrl', function(Auth) {
-        Auth.requestCurrentUser(); // A rejected promise since no one's
-                                   // logged in.
-
-        // Log in user...
-
-        Auth.requestCurrentUser().then(function(user) {
+        Auth.currentUser().then(function(user) {
+            // User was logged in, or Devise returned
+            // previously authenticated session.
             console.log(user); // => {id: 1, ect: '...'}
+        }, function(error) {
+            // unauthenticated error
         });
     });
 ```
@@ -93,7 +92,7 @@ angular.module('myModule', ['Devise']).
 ### Auth.isAuthenticated()
 
 `Auth.isAuthenticated()` is a helper method to determine if a
-currentUser is present.
+currentUser is logged in with Auth.
 
 ```javascript
 angular.module('myModule', ['Devise']).

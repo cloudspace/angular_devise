@@ -72,7 +72,7 @@ devise.provider('Auth', function AuthProvider() {
              * This is shared between all instances of Auth
              * on the scope.
              */
-            currentUser: null,
+            _currentUser: null,
 
             /**
              * A login function to authenticate with the server.
@@ -98,8 +98,8 @@ devise.provider('Auth', function AuthProvider() {
             login: function(opts) {
                 var user = pick(opts, 'email', 'password');
                 return $http[method('login')](path('login'), {user: user}).then(function(response) {
-                    service.currentUser = response.data;
-                    return service.requestCurrentUser();
+                    service._currentUser = response.data;
+                    return service.currentUser();
                 });
             },
 
@@ -120,8 +120,8 @@ devise.provider('Auth', function AuthProvider() {
              */
             logout: function() {
                 return $http[method('logout')](path('logout')).then(function() {
-                    var oldUser = service.currentUser;
-                    service.currentUser = null;
+                    var oldUser = service._currentUser;
+                    service._currentUser = null;
                     return oldUser;
                 });
             },
@@ -155,8 +155,8 @@ devise.provider('Auth', function AuthProvider() {
                     user.password_confirmation = user.password;
                 }
                 return $http[method('register')](path('register'), {user: user}).then(function(response) {
-                    service.currentUser = response.data;
-                    return service.requestCurrentUser();
+                    service._currentUser = response.data;
+                    return service.currentUser();
                 });
             },
 
@@ -173,9 +173,9 @@ devise.provider('Auth', function AuthProvider() {
              * @returns {Promise} A $http promise that will be resolved or
              *                  rejected by the server.
              */
-            requestCurrentUser: function() {
+            currentUser: function() {
                 if (service.isAuthenticated()) {
-                    return $q.when(service.currentUser);
+                    return $q.when(service._currentUser);
                 }
                 return service.login();
             },
@@ -186,7 +186,7 @@ devise.provider('Auth', function AuthProvider() {
              * @returns Boolean
              */
             isAuthenticated: function(){
-                return !!service.currentUser;
+                return !!service._currentUser;
             }
         };
 
