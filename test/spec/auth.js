@@ -18,7 +18,7 @@ describe('Provider: Devise.Auth', function () {
     }));
     function forceSignIn(Auth, user) {
         user = (user === undefined) ? {} : user;
-        Auth.currentUser = user;
+        Auth._currentUser = user;
         return user;
     }
     function jsonEquals(obj, other) {
@@ -145,7 +145,7 @@ describe('Provider: Devise.Auth', function () {
         });
 
         it('resolves promise to old currentUser', function() {
-            var user = Auth.currentUser = {id: 0};
+            var user = forceSignIn(Auth, {id: 0});
             var callback = jasmine.createSpy('callback');
             Auth.logout().then(callback);
 
@@ -209,7 +209,7 @@ describe('Provider: Devise.Auth', function () {
         });
     });
 
-    describe('.requestCurrentUser', function() {
+    describe('.currentUser', function() {
         describe('when authenticated', function() {
             var user;
             beforeEach(function() {
@@ -219,7 +219,7 @@ describe('Provider: Devise.Auth', function () {
             it('returns a promise', function() {
                 var callback = jasmine.createSpy('callback');
 
-                Auth.requestCurrentUser().then(callback);
+                Auth.currentUser().then(callback);
                 // use #$apply to have the promise resolve.
                 $rootScope.$apply();
 
@@ -229,7 +229,7 @@ describe('Provider: Devise.Auth', function () {
             it('resolves the promise with the currentUser', function() {
                 var callback = jasmine.createSpy('callback');
 
-                Auth.requestCurrentUser().then(callback);
+                Auth.currentUser().then(callback);
                 // use #$apply to have the promise resolve.
                 $rootScope.$apply();
 
@@ -245,7 +245,7 @@ describe('Provider: Devise.Auth', function () {
                 });
 
                 it('fetches user from server', function() {
-                    Auth.requestCurrentUser();
+                    Auth.currentUser();
                     $httpBackend.flush();
                     $httpBackend.verifyNoOutstandingExpectation();
                     $httpBackend.verifyNoOutstandingRequest();
@@ -253,7 +253,7 @@ describe('Provider: Devise.Auth', function () {
 
                 it('resolves promise with fetched user', function() {
                     var callback = jasmine.createSpy('callback');
-                    Auth.requestCurrentUser().then(callback);
+                    Auth.currentUser().then(callback);
                     $httpBackend.flush();
 
                     // use #$apply to have the promise resolve.
@@ -271,7 +271,7 @@ describe('Provider: Devise.Auth', function () {
 
                 it('rejects promise with error', function() {
                     var callback = jasmine.createSpy('callback');
-                    Auth.requestCurrentUser().catch(callback);
+                    Auth.currentUser().catch(callback);
                     $httpBackend.flush();
 
                     // use #$apply to have the promise resolve.
