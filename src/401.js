@@ -3,7 +3,7 @@ devise.factory('deviseInterceptor401', function($rootScope, $q) {
     return {
         responseError: function(response) {
             if (response.status === 401) {
-                $rootScope.$broadcast('devise:unauthorized');
+                $rootScope.$broadcast('devise:unauthorized', response);
             }
             return $q.reject(response);
         }
