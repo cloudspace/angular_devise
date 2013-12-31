@@ -42,6 +42,16 @@ describe('Service: Devise.401', function () {
             $httpBackend.flush();
             expect(callback).toHaveBeenCalled();
         }));
+
+        it('passes response to broadcast', inject(function ($rootScope) {
+            var callback = jasmine.createSpy('callback');
+            $rootScope.$on('devise:unauthorized', callback);
+
+            $http.get('/foo');
+            $httpBackend.flush();
+
+            expect(callback.calls[0].args[1].status).toBe(401);
+        }));
     });
 
 });
