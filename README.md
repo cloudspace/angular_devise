@@ -56,8 +56,9 @@ currentUser. There are three possible outcomes:
  2. Auth has not authenticated a user but the server has a previously
     authenticated session, Auth will attempt to retrieve that session
     and resolve with its user.
- 3. Neither Auth nor the server has an authenticated session, and will
-    reject with an unauthenticated error.
+ 3. Neither Auth nor the server has an authenticated session, and an
+    unresolved promise will be returned. (see
+    [Interceptor](#interceptor) for rationale.)
 
 ```javascript
 angular.module('myModule', ['Devise']).
@@ -208,6 +209,70 @@ angular.module('myModule', ['Devise']).
     config(function(AuthProvider) {
         AuthProvider.registerPath('path/on/server.json');
         AuthProvider.registerMethod('GET');
+    });
+```
+
+
+Interceptor
+-----------
+
+AngularDevise creates an [$http
+Interceptor](http://docs.angularjs.org/api/ng.$http#description_interceptors)
+that listens for `401 Unauthorized` response codes. Its purpose is to
+catch unauthorized requests on-the-fly and seamlessly recover. When it
+catches a 401, it will:
+ 1. create a deferred
+ 2. broadcast a `devise:unauthorized` event passing:
+    - the ajax response
+    - the deferred
+ 3. return the deferred's promise
+
+Since the deferred is passed to the `devise:unauthorized` event, you are
+free to resolve it (and the request) inside of the event listener. For
+instance:
+
+```javascript
+angular.module('myModule', []).
+    controller('myCtrl', function($scope, Auth, $http) {
+        // Guest user
+
+        // Catch unauthorized requests and recover.
+        $scope.$on('devise:unauthorized', function(event, xhr, deferred) {
+            // Ask user for login credentials
+
+            Auth.login(credentials).then(function(user) {
+                // Successfully logged in.
+                // Redo the original request.
+                $http(xhr.config).then(deferred.resolve, deferred.reject);
+            }, function(error) {
+                // There was an error logging in.
+                // Reject the original request's promise.
+                deferred.reject(error);
+            });
+        });
+
+        // Request requires authorization
+        $http.delete('/users/1').then(function(response) {
+            // Deleted user 1
+        }, function(error) {
+            // Something went wrong.
+        });
+    });
+```
+
+The Interceptor can be disabled on a per-request basis by setting
+`ignoreAuth: true` on the [$http
+config](http://docs.angularjs.org/api/ng.$http#usage) object.
+
+```javascript
+angular.module('myModule', []).
+    controller('myCtrl', function($http) {
+        // Disable per-request
+        $http({
+            url: '/',
+            ignoreAuth: true,
+            // ...
+        });
     });
 ```
 
