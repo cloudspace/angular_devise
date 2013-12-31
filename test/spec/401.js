@@ -5,16 +5,7 @@ describe('Service: Devise.401', function () {
     // load the service's module
     beforeEach(module('Devise'));
 
-    // instantiate service
-    var interceptor, promise, wrappedPromise;
     var $http, $httpBackend;
-    beforeEach(inject(function (_deviseInterceptor401_) {
-        interceptor = _deviseInterceptor401_;
-        wrappedPromise = {};
-        promise = {
-            then: jasmine.createSpy('then').andReturn(wrappedPromise)
-        };
-    }));
     beforeEach(inject(function(_$http_, _$httpBackend_) {
         $http = _$http_;
         $httpBackend = _$httpBackend_;
@@ -22,36 +13,78 @@ describe('Service: Devise.401', function () {
 
     describe('responseError', function() {
         beforeEach(function() {
-            interceptor = interceptor.responseError;
             $httpBackend.expect('GET', '/foo').respond(401);
         });
 
-        it('returns rejected promise on 401', function () {
-            var callback = jasmine.createSpy('callback');
-            $http.get('/foo').catch(function() {
-                callback();
+        describe('when ignoreAuth is true', function() {
+            beforeEach(function() {
+                var get = $http.get;
+                $http.get = function(url, config) {
+                    if (!config) { config = {}; }
+                    config.ignoreAuth = true;
+                    return get.call($http, url, config);
+                };
             });
-            $httpBackend.flush();
-            expect(callback).toHaveBeenCalled();
+
+            it('returns rejected promise on 401', function () {
+                var callback = jasmine.createSpy('callback');
+                $http.get('/foo').catch(function() {
+                    callback();
+                });
+                $httpBackend.flush();
+                expect(callback).toHaveBeenCalled();
+            });
         });
 
-        it('broadcasts "devise:unauthorized" on 401 error', inject(function ($rootScope) {
-            var callback = jasmine.createSpy('callback');
-            $rootScope.$on('devise:unauthorized', callback);
-            $http.get('/foo');
-            $httpBackend.flush();
-            expect(callback).toHaveBeenCalled();
-        }));
+        describe('when ignoreAuth is false (default)', function() {
+            it('broadcasts "devise:unauthorized" on 401 error', inject(function ($rootScope) {
+                var callback = jasmine.createSpy('callback');
+                $rootScope.$on('devise:unauthorized', callback);
+                $http.get('/foo');
+                $httpBackend.flush();
+                expect(callback).toHaveBeenCalled();
+            }));
 
-        it('passes response to broadcast', inject(function ($rootScope) {
-            var callback = jasmine.createSpy('callback');
-            $rootScope.$on('devise:unauthorized', callback);
+            it('passes response to broadcast', inject(function ($rootScope) {
+                var response;
+                $rootScope.$on('devise:unauthorized', function(event, resp) {
+                    response = resp;
+                });
 
-            $http.get('/foo');
-            $httpBackend.flush();
+                $http.get('/foo');
+                $httpBackend.flush();
 
-            expect(callback.calls[0].args[1].status).toBe(401);
-        }));
+                expect(response.status).toBe(401);
+            }));
+
+            it('passes a deferred to broadcast', inject(function ($rootScope) {
+                var deferred;
+                $rootScope.$on('devise:unauthorized', function(event, resp, d) {
+                    deferred = d;
+                });
+
+                $http.get('/foo');
+                $httpBackend.flush();
+
+                expect(typeof deferred.resolve).toBe('function');
+                expect(typeof deferred.reject).toBe('function');
+            }));
+
+            it("returns deferred's promise", inject(function ($rootScope) {
+                var data = {};
+                $rootScope.$on('devise:unauthorized', function(event, response, deferred) {
+                    deferred.resolve(data);
+                });
+
+                var ret;
+                $http.get('/foo').then(function(data) {
+                    ret = data;
+                });
+                $httpBackend.flush();
+
+                expect(ret).toBe(data);
+            }));
+        });
     });
 
 });

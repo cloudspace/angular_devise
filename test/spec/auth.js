@@ -284,14 +284,12 @@ describe('Provider: Devise.Auth', function () {
                     $httpBackend.expect('POST', '/users/sign_in.json').respond(401, error);
                 });
 
-                it('rejects promise with error', function() {
+                it('does not resolve promise', function() {
                     var callback = jasmine.createSpy('callback');
-                    Auth.currentUser().catch(callback);
+                    Auth.currentUser().then(callback);
                     $httpBackend.flush();
 
-                    var call = callback.calls[0];
-                    expect(call.args[0].data).toEqual(error);
-                    expect(call.args[0].status).toBe(401);
+                    expect(callback).not.toHaveBeenCalled();
                 });
             });
         });
