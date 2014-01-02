@@ -72,16 +72,6 @@ devise.provider('Auth', function AuthProvider() {
         return this;
     };
 
-    // A cached slice
-    var slice = Array.prototype.slice;
-    // A simplified partial function.
-    // Ignores arguments to the returned partial
-    function partial(fn) {
-        var args = slice.call(arguments, 1);
-        return function() {
-            return fn.apply(this, args);
-        };
-    }
     // Creates a function that always
     // returns a given arg.
     function constant(arg) {
@@ -98,6 +88,10 @@ devise.provider('Auth', function AuthProvider() {
         function save(user) {
             service._currentUser = user;
             return user;
+        }
+        // A reset that saves null for currentUser
+        function reset() {
+            save(null);
         }
 
         var service = {
@@ -148,8 +142,8 @@ devise.provider('Auth', function AuthProvider() {
              *                  rejected by the server.
              */
             logout: function() {
-                var oldUser = constant(service._currentUser);
-                return $http[method('logout')](path('logout')).then(partial(save, null)).then(oldUser);
+                var returnOldUser = constant(service._currentUser);
+                return $http[method('logout')](path('logout')).then(reset).then(returnOldUser);
             },
 
             /**
