@@ -240,18 +240,24 @@ angular.module('myModule', []).
         $scope.$on('devise:unauthorized', function(event, xhr, deferred) {
             // Ask user for login credentials
 
-            Auth.login(credentials).then(function(user) {
+            Auth.login(credentials).then(function() {
                 // Successfully logged in.
                 // Redo the original request.
-                $http(xhr.config).then(deferred.resolve, deferred.reject);
+                return $http(xhr.config);
+            }).then(function(response) {
+                // Successfully recovered from unauthorized error.
+                // Resolve the original request's promise.
+                deferred.resolve(response);
             }, function(error) {
-                // There was an error logging in.
+                // There was an error.
                 // Reject the original request's promise.
                 deferred.reject(error);
             });
         });
 
         // Request requires authorization
+        // Will cause a `401 Unauthorized` response,
+        // that will be recovered by our listener above.
         $http.delete('/users/1').then(function(response) {
             // Deleted user 1
         }, function(error) {
