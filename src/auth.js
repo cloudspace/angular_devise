@@ -40,27 +40,15 @@ devise.provider('Auth', function AuthProvider() {
         return response.data;
     };
 
-    // A helper function that will get the
-    // proper method.
-    function method(action) {
-        return methods[action].toLowerCase();
-    }
-    // A helper function that will get the
-    // proper path and append the path extension.
-    function path(action) {
-        return paths[action];
-    }
-    // A helper function that will get the proper config 
+    // A helper function that will setup the ajax config
     // and merge the data key if provided
-    function httpConfig(key, data) {
+    function httpConfig(action, data) {
         var config = {
-            method: method(key),
-            url: path(key),
+            method: methods[action].toLowerCase(),
+            url: paths[action],
             ignoreAuth: ignoreAuth
         };
-        if (typeof data !== "undefined" && data !== null) {
-            config.data = data;
-        }
+        if (data) { config.data = data; }
         return config;
     }
 
