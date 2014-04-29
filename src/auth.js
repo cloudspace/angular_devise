@@ -18,6 +18,11 @@ devise.provider('Auth', function AuthProvider() {
     };
 
     /**
+     * Set to true if 401 interception of the provider is not desired
+     */
+    var ignoreAuth = false;
+
+    /**
      * The parsing function used to turn a $http
      * response into a "user".
      *
@@ -45,6 +50,19 @@ devise.provider('Auth', function AuthProvider() {
     function path(action) {
         return paths[action];
     }
+    // A helper function that will get the proper config 
+    // and merge the data key if provided
+    function httpConfig(key, data) {
+        var config = {
+            method: method(key),
+            url: path(key),
+            ignoreAuth: ignoreAuth
+        };
+        if (typeof data !== "undefined" && data !== null) {
+            config.data = data;
+        }
+        return config;
+    }
 
     // A helper function to define our configure functions.
     // Loops over all properties in obj, and creates a get/set
@@ -62,6 +80,11 @@ devise.provider('Auth', function AuthProvider() {
     }
     configure.call(this, methods, 'Method');
     configure.call(this, paths, 'Path');
+
+    // The ignoreAuth config function
+    this.ignoreAuth = function(value) {
+        ignoreAuth = value;
+    };
 
     // The parse configure function.
     this.parse = function(fn) {
@@ -123,7 +146,7 @@ devise.provider('Auth', function AuthProvider() {
              */
             login: function(creds) {
                 creds = creds || {};
-                return $http[method('login')](path('login'), {user: creds}).then(parse).then(save);
+                return $http(httpConfig('login', {user: creds})).then(parse).then(save);
             },
 
             /**
@@ -143,7 +166,7 @@ devise.provider('Auth', function AuthProvider() {
              */
             logout: function() {
                 var returnOldUser = constant(service._currentUser);
-                return $http[method('logout')](path('logout')).then(reset).then(returnOldUser);
+                return $http(httpConfig('logout')).then(reset).then(returnOldUser);
             },
 
             /**
@@ -167,7 +190,7 @@ devise.provider('Auth', function AuthProvider() {
              */
             register: function(creds) {
                 creds = creds || {};
-                return $http[method('register')](path('register'), {user: creds}).then(parse).then(save);
+                return $http(httpConfig('register', {user: creds})).then(parse).then(save);
             },
 
             /**
