@@ -71,7 +71,11 @@ devise.provider('Auth', function AuthProvider() {
 
     // The ignoreAuth config function
     this.ignoreAuth = function(value) {
-        ignoreAuth = value;
+        if (value === undefined) {
+            return ignoreAuth;
+        }
+        ignoreAuth = !!value;
+        return this;
     };
 
     // The parse configure function.
