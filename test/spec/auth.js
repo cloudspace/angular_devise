@@ -95,17 +95,17 @@ describe('Provider: Devise.Auth', function () {
 
             expect(callCount).toBe(1);
         });
-        
+
         it('.ignoreAuth', function() {
             initService(function() {
-                AuthProvider['ignoreAuth'](true);
+                AuthProvider.ignoreAuth(true);
             });
             var callback = jasmine.createSpy('callback');
             $httpBackend.expect('POST', '/users/sign_in.json').respond(401);
-            Auth['login']().catch(function(error) {
-                callback();
-            });
+
+            Auth.login().catch(callback);
             $httpBackend.flush();
+
             expect(callback).toHaveBeenCalled();
         });
     });
