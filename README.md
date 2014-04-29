@@ -275,17 +275,20 @@ angular.module('myModule', []).
     });
 ```
 
-The Interceptor can be disabled on a per-request basis by setting
-`ignoreAuth: true` on the [$http
-config](http://docs.angularjs.org/api/ng.$http#usage) object.
+The Interceptor can be disabled globally or on a per-request basis using the
+`ignoreAuth` setting.
 
 ```javascript
-angular.module('myModule', []).
+angular.module('myModule', ['Devise']).
+    config(function(AuthProvider) {
+        // Ignore 401 Unauthorized everywhere
+        AuthProvider.ignoreAuth(true);
+    }).
     controller('myCtrl', function($http) {
-        // Disable per-request
+        // Enable per-request
         $http({
             url: '/',
-            ignoreAuth: true,
+            ignoreAuth: false,
             // ...
         });
     });
@@ -325,6 +328,10 @@ angular.module('myModule', ['Devise']).
         // Customise register
         AuthProvider.registerMethod('PATCH');
         AuthProvider.registerPath('/user/sign_up.json');
+
+        // Ignore 401 Unauthorized everywhere
+        // Disables `devise:unauthorized` interceptor
+        AuthProvider.ignoreAuth(true);
 
         // Customize user parsing
         // NOTE: **MUST** return a truth-y expression
