@@ -12,5 +12,4 @@ devise.factory('deviseInterceptor401', function($rootScope, $q) {
     };
 }).config(function($httpProvider) {
     $httpProvider.interceptors.push('deviseInterceptor401');
-    // $httpProvider.defaults.headers.common['X-CSRF-Token'] = angular.element(document.querySelector('meta[name=csrf-token]')).attr('content');
 });
