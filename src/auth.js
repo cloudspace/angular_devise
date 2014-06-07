@@ -95,7 +95,7 @@ devise.provider('Auth', function AuthProvider() {
         };
     }
 
-    this.$get = function($q, $http) {
+    this.$get = function($q, $http, $rootScope) {
         // Our shared save function, called
         // by `then`s. Will return the first argument,
         // unless it is falsey (then it'll return
@@ -138,7 +138,13 @@ devise.provider('Auth', function AuthProvider() {
              */
             login: function(creds) {
                 creds = creds || {};
-                return $http(httpConfig('login', {user: creds})).then(parse).then(save);
+                return $http(httpConfig('login', {user: creds})).then(parse).then(save).then(function(user) {
+                    if (!angular.equals(creds, {})) {
+                        $rootScope.$broadcast('devise:login', user);
+                    }
+                    $rootScope.$broadcast('devise:session', user);
+                    return user;
+                });
             },
 
             /**
@@ -158,7 +164,10 @@ devise.provider('Auth', function AuthProvider() {
              */
             logout: function() {
                 var returnOldUser = constant(service._currentUser);
-                return $http(httpConfig('logout')).then(reset).then(returnOldUser);
+                return $http(httpConfig('logout')).then(reset).then(returnOldUser).then(function(user) {
+                    $rootScope.$broadcast('devise:logout', user);
+                    return user;
+                });
             },
 
             /**
