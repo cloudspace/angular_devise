@@ -64,7 +64,8 @@ currentUser. There are three possible outcomes:
  1. Auth has authenticated a user, and will resolve with that user.
  2. Auth has not authenticated a user but the server has a previously
     authenticated session, Auth will attempt to retrieve that session
-    and resolve with its user.
+    and resolve with its user. Then, a `devise:session` event
+    will be broadcast with the current user as the argument.
  3. Neither Auth nor the server has an authenticated session, and an
     unresolved promise will be returned. (see
     [Interceptor](#interceptor) for rationale.)
@@ -127,6 +128,11 @@ will resolve to the logged-in user. See
 [AuthProvider.parse()](#authprovider) for parsing the user into a usable
 object.
 
+Upon a successful login, two events will be broadcast, `devise:login` and
+`devise:session`, both with the currentUser as the argument. Login will only
+be broadcast if the user was logged in by `Auth.login({...})`. If the server
+has a previously authenticated session, only the session event will be broadcast.
+
 ```javascript
 angular.module('myModule', ['Devise']).
     controller('myCtrl', function(Auth) {
@@ -139,6 +145,14 @@ angular.module('myModule', ['Devise']).
             console.log(user); // => {id: 1, ect: '...'}
         }, function(error) {
             // Authentication failed...
+        });
+
+        $scope.$on('devise:login', function(event, currentUser) {
+            // user logged in by Auth.login({...})
+        });
+
+         $scope.$on('devise:session', function(event, currentUser) {
+            // after a login, a hard refresh, a new tab
         });
     });
 ```
@@ -157,7 +171,8 @@ angular.module('myModule', ['Devise']).
 ### Auth.logout()
 
 Use `Auth.logout()` to de-authenticate from the server. `Auth.logout()`
-returns a promise that will be resolved to the old currentUser.
+returns a promise that will be resolved to the old currentUser. Then a
+`devise:logout` event will be broadcast with the old currentUser as the argument.
 
 ```javascript
 angular.module('myModule', ['Devise']).
@@ -168,6 +183,10 @@ angular.module('myModule', ['Devise']).
             // alert(oldUser.name + "you're signed out now.");
         }, function(error) {
             // An error occurred logging out.
+        });
+
+        $scope.$on('devise:logout', function(event, oldCurrentUser) {
+            // ...
         });
     });
 ```
