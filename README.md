@@ -336,15 +336,15 @@ All of these can be configured using a `.config` block in your module.
 ```javascript
 angular.module('myModule', ['Devise']).
     config(function(AuthProvider) {
-        // Customise login
+        // Customize login
         AuthProvider.loginMethod('GET');
         AuthProvider.loginPath('/admins/login.json');
 
-        // Customise logout
+        // Customize logout
         AuthProvider.logoutMethod('POST');
         AuthProvider.logoutPath('/user/logout.json');
 
-        // Customise register
+        // Customize register
         AuthProvider.registerMethod('PATCH');
         AuthProvider.registerPath('/user/sign_up.json');
 
