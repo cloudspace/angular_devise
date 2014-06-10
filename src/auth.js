@@ -144,14 +144,15 @@ devise.provider('Auth', function AuthProvider() {
              *                  rejected by the server.
              */
             login: function(creds) {
-                var withCredentials = arguments.length > 0;
-                // var withCredentials = typeof creds != 'undefined';
+                var withCredentials = arguments.length > 0,
+                    loggedIn = service.isAuthenticated();
+
                 creds = creds || {};
                 return $http(httpConfig('login', {user: creds}))
                     .then(parse)
                     .then(save)
                     .then(function(user) {
-                        if (withCredentials) {
+                        if (withCredentials && !loggedIn) {
                             return broadcast('new-session')(user);
                         }
                         return user;
