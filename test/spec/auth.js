@@ -162,8 +162,8 @@ describe('Provider: Devise.Auth', function () {
         it('broadcasts the session event and login events', function() {
             var loginCallback = jasmine.createSpy('login callback');
             var sessionCallback = jasmine.createSpy('session callback');
+            $rootScope.$on('devise:new-session', sessionCallback);
             $rootScope.$on('devise:login', loginCallback);
-            $rootScope.$on('devise:session', sessionCallback);
 
             Auth.login(creds);
             $httpBackend.flush();
@@ -261,6 +261,16 @@ describe('Provider: Devise.Auth', function () {
 
             expect(callback).toHaveBeenCalledWith(user);
         });
+
+        it('resolves promise to currentUser', function() {
+            var callback = jasmine.createSpy('callback');
+            $rootScope.$on('devise:registered', callback);
+
+            Auth.register();
+            $httpBackend.flush();
+
+            expect(callback).toHaveBeenCalled();
+        });
     });
 
     describe('.currentUser', function() {
@@ -292,9 +302,10 @@ describe('Provider: Devise.Auth', function () {
 
             it('does not broadcasts any events', function() {
                 var callback = jasmine.createSpy('any callback');
+                $rootScope.$on('devise:new-session', callback);
                 $rootScope.$on('devise:login', callback);
-                $rootScope.$on('devise:session', callback);
                 Auth.currentUser();
+                $rootScope.$apply();
 
                 expect(callback).not.toHaveBeenCalled();
             });
@@ -324,15 +335,15 @@ describe('Provider: Devise.Auth', function () {
 
                 it('broadcasts the session event but not the login event', function() {
                     var loginCallback = jasmine.createSpy('login callback');
-                    var sessionCallback = jasmine.createSpy('session callback');
+                    var sessionCallback = jasmine.createSpy('new-session callback');
+                    $rootScope.$on('devise:new-session', sessionCallback);
                     $rootScope.$on('devise:login', loginCallback);
-                    $rootScope.$on('devise:session', sessionCallback);
 
                     Auth.currentUser();
                     $httpBackend.flush();
 
-                    expect(loginCallback).not.toHaveBeenCalled();
-                    expect(sessionCallback).toHaveBeenCalled();
+                    expect(sessionCallback).not.toHaveBeenCalled();
+                    expect(loginCallback).toHaveBeenCalled();
                 });
             });
 
