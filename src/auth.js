@@ -207,7 +207,7 @@ devise.provider('Auth', function AuthProvider() {
                 return $http(httpConfig('register', {user: creds}))
                     .then(parse)
                     .then(save)
-                    .then(broadcast('registered'));
+                    .then(broadcast('new-registration'));
             },
 
             /**

@@ -264,7 +264,7 @@ describe('Provider: Devise.Auth', function () {
 
         it('resolves promise to currentUser', function() {
             var callback = jasmine.createSpy('callback');
-            $rootScope.$on('devise:registered', callback);
+            $rootScope.$on('devise:new-registration', callback);
 
             Auth.register();
             $httpBackend.flush();
