@@ -168,8 +168,8 @@ describe('Provider: Devise.Auth', function () {
             Auth.login(creds);
             $httpBackend.flush();
 
-            expect(loginCallback).toHaveBeenCalled();
-            expect(sessionCallback).toHaveBeenCalled();
+            expect(loginCallback).toHaveBeenCalledWith(jasmine.any(Object), user);
+            expect(sessionCallback).toHaveBeenCalledWith(jasmine.any(Object), user);
         });
     });
 
@@ -269,7 +269,7 @@ describe('Provider: Devise.Auth', function () {
             Auth.register();
             $httpBackend.flush();
 
-            expect(callback).toHaveBeenCalled();
+            expect(callback).toHaveBeenCalledWith(jasmine.any(Object), user);
         });
     });
 
@@ -343,7 +343,7 @@ describe('Provider: Devise.Auth', function () {
                     $httpBackend.flush();
 
                     expect(sessionCallback).not.toHaveBeenCalled();
-                    expect(loginCallback).toHaveBeenCalled();
+                    expect(loginCallback).toHaveBeenCalledWith(jasmine.any(Object), user);
                 });
             });
 
