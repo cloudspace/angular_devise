@@ -129,9 +129,9 @@ will resolve to the logged-in user. See
 object.
 
 Upon a successful login, two events will be broadcast, `devise:login` and
-`devise:session`, both with the currentUser as the argument. Login will only
+`devise:session`, both with the currentUser as the argument. New-Session will only
 be broadcast if the user was logged in by `Auth.login({...})`. If the server
-has a previously authenticated session, only the session event will be broadcast.
+has a previously authenticated session, only the login event will be broadcast.
 
 ```javascript
 angular.module('myModule', ['Devise']).
@@ -148,11 +148,11 @@ angular.module('myModule', ['Devise']).
         });
 
         $scope.$on('devise:login', function(event, currentUser) {
-            // user logged in by Auth.login({...})
+            // after a login, a hard refresh, a new tab
         });
 
-         $scope.$on('devise:session', function(event, currentUser) {
-            // after a login, a hard refresh, a new tab
+        $scope.$on('devise:new-session', function(event, currentUser) {
+            // user logged in by Auth.login({...})
         });
     });
 ```
@@ -210,7 +210,8 @@ secure them. `creds` is an object that should contain any credentials
 needed to register with the server. `Auth.register()` will return a
 promise that will resolve to the registered user. See
 [AuthProvider.parse()](#authproviderparse) for parsing the user into a
-usable object.
+usable object. Then a `devise:new-registration` event will be broadcast
+with the user object as the argument.
 
 ```javascript
 angular.module('myModule', ['Devise']).
@@ -225,6 +226,10 @@ angular.module('myModule', ['Devise']).
             console.log(registeredUser); // => {id: 1, ect: '...'}
         }, function(error) {
             // Registration failed...
+        });
+
+        $scope.$on('devise:new-registration', function(event, user) {
+            // ...
         });
     });
 ```
