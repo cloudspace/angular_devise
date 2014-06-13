@@ -262,7 +262,7 @@ describe('Provider: Devise.Auth', function () {
             expect(callback).toHaveBeenCalledWith(user);
         });
 
-        it('resolves promise to currentUser', function() {
+        it('broadcasts the new-registration event after a sucessful registration', function() {
             var callback = jasmine.createSpy('callback');
             $rootScope.$on('devise:new-registration', callback);
 
