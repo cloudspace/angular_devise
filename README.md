@@ -219,7 +219,7 @@ angular.module('myModule', ['Devise']).
     });
 ```
 
-or by directly overwriting it, perhaps when defining a custom version of
+or by directly overwriting it, perhaps when writing a custom version of
 the Auth service which depends on another service:
 
 ```javascript

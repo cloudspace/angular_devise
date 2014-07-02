@@ -129,9 +129,7 @@ devise.provider('Auth', function AuthProvider() {
              * Defaults to the parsing function set in the provider,
              * but may also be overwritten directly on the service.
              */
-            parse: function(response) {
-                return _parse(response);
-            },
+            parse: _parse,
 
             /**
              * A login function to authenticate with the server.
