@@ -28,8 +28,8 @@ describe('Provider: Devise.Auth', function () {
     describe('can configure', function() {
         function initService(fn) {
             fn();
-            inject(function($q, $http) {
-                Auth = new AuthProvider.$get($q, $http);
+            inject(function($q, $http, $rootScope) {
+                Auth = new AuthProvider.$get($q, $http, $rootScope);
             });
         }
         function testPathConfigure(action, method, overrideMethod) {
@@ -112,6 +112,7 @@ describe('Provider: Devise.Auth', function () {
 
     describe('.login', function() {
         var user;
+        var creds = {email: 'test', blah: true};
         var postCallback;
         function constantTrue() {
             return true;
@@ -137,11 +138,10 @@ describe('Provider: Devise.Auth', function () {
         });
 
         it('POSTS credential data', function() {
-            var u = {email: 'test', blah: true};
             postCallback = function(data) {
-                return jsonEquals(data.user, u);
+                return jsonEquals(data.user, creds);
             };
-            Auth.login(u);
+            Auth.login(creds);
             $httpBackend.flush();
         });
 
@@ -157,6 +157,19 @@ describe('Provider: Devise.Auth', function () {
             $httpBackend.flush();
 
             expect(callback).toHaveBeenCalledWith(user);
+        });
+
+        it('broadcasts the session event and login events', function() {
+            var loginCallback = jasmine.createSpy('login callback');
+            var sessionCallback = jasmine.createSpy('session callback');
+            $rootScope.$on('devise:new-session', sessionCallback);
+            $rootScope.$on('devise:login', loginCallback);
+
+            Auth.login(creds);
+            $httpBackend.flush();
+
+            expect(loginCallback).toHaveBeenCalledWith(jasmine.any(Object), user);
+            expect(sessionCallback).toHaveBeenCalledWith(jasmine.any(Object), user);
         });
     });
 
@@ -187,6 +200,16 @@ describe('Provider: Devise.Auth', function () {
             $httpBackend.flush();
 
             expect(callback).toHaveBeenCalledWith(user);
+        });
+
+        it('broadcasts the logout event', function() {
+            var callback = jasmine.createSpy('logout callback');
+            $rootScope.$on('devise:logout', callback);
+
+            Auth.logout();
+            $httpBackend.flush();
+
+            expect(callback).toHaveBeenCalled();
         });
     });
 
@@ -238,6 +261,16 @@ describe('Provider: Devise.Auth', function () {
 
             expect(callback).toHaveBeenCalledWith(user);
         });
+
+        it('broadcasts the new-registration event after a sucessful registration', function() {
+            var callback = jasmine.createSpy('callback');
+            $rootScope.$on('devise:new-registration', callback);
+
+            Auth.register();
+            $httpBackend.flush();
+
+            expect(callback).toHaveBeenCalledWith(jasmine.any(Object), user);
+        });
     });
 
     describe('.currentUser', function() {
@@ -266,6 +299,16 @@ describe('Provider: Devise.Auth', function () {
 
                 expect(callback).toHaveBeenCalledWith(user);
             });
+
+            it('does not broadcasts any events', function() {
+                var callback = jasmine.createSpy('any callback');
+                $rootScope.$on('devise:new-session', callback);
+                $rootScope.$on('devise:login', callback);
+                Auth.currentUser();
+                $rootScope.$apply();
+
+                expect(callback).not.toHaveBeenCalled();
+            });
         });
 
         describe('when unauthenticated', function() {
@@ -288,6 +331,19 @@ describe('Provider: Devise.Auth', function () {
                     $httpBackend.flush();
 
                     expect(callback).toHaveBeenCalledWith(user);
+                });
+
+                it('broadcasts the session event but not the login event', function() {
+                    var loginCallback = jasmine.createSpy('login callback');
+                    var sessionCallback = jasmine.createSpy('new-session callback');
+                    $rootScope.$on('devise:new-session', sessionCallback);
+                    $rootScope.$on('devise:login', loginCallback);
+
+                    Auth.currentUser();
+                    $httpBackend.flush();
+
+                    expect(sessionCallback).not.toHaveBeenCalled();
+                    expect(loginCallback).toHaveBeenCalledWith(jasmine.any(Object), user);
                 });
             });
 

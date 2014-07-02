@@ -64,7 +64,8 @@ currentUser. There are three possible outcomes:
  1. Auth has authenticated a user, and will resolve with that user.
  2. Auth has not authenticated a user but the server has a previously
     authenticated session, Auth will attempt to retrieve that session
-    and resolve with its user.
+    and resolve with its user. Then, a `devise:session` event
+    will be broadcast with the current user as the argument.
  3. Neither Auth nor the server has an authenticated session, and an
     unresolved promise will be returned. (see
     [Interceptor](#interceptor) for rationale.)
@@ -127,6 +128,11 @@ will resolve to the logged-in user. See
 [AuthProvider.parse()](#authprovider) for parsing the user into a usable
 object.
 
+Upon a successful login, two events will be broadcast, `devise:login` and
+`devise:session`, both with the currentUser as the argument. New-Session will only
+be broadcast if the user was logged in by `Auth.login({...})`. If the server
+has a previously authenticated session, only the login event will be broadcast.
+
 ```javascript
 angular.module('myModule', ['Devise']).
     controller('myCtrl', function(Auth) {
@@ -139,6 +145,14 @@ angular.module('myModule', ['Devise']).
             console.log(user); // => {id: 1, ect: '...'}
         }, function(error) {
             // Authentication failed...
+        });
+
+        $scope.$on('devise:login', function(event, currentUser) {
+            // after a login, a hard refresh, a new tab
+        });
+
+        $scope.$on('devise:new-session', function(event, currentUser) {
+            // user logged in by Auth.login({...})
         });
     });
 ```
@@ -157,7 +171,8 @@ angular.module('myModule', ['Devise']).
 ### Auth.logout()
 
 Use `Auth.logout()` to de-authenticate from the server. `Auth.logout()`
-returns a promise that will be resolved to the old currentUser.
+returns a promise that will be resolved to the old currentUser. Then a
+`devise:logout` event will be broadcast with the old currentUser as the argument.
 
 ```javascript
 angular.module('myModule', ['Devise']).
@@ -168,6 +183,10 @@ angular.module('myModule', ['Devise']).
             // alert(oldUser.name + "you're signed out now.");
         }, function(error) {
             // An error occurred logging out.
+        });
+
+        $scope.$on('devise:logout', function(event, oldCurrentUser) {
+            // ...
         });
     });
 ```
@@ -191,7 +210,8 @@ secure them. `creds` is an object that should contain any credentials
 needed to register with the server. `Auth.register()` will return a
 promise that will resolve to the registered user. See
 [AuthProvider.parse()](#authproviderparse) for parsing the user into a
-usable object.
+usable object. Then a `devise:new-registration` event will be broadcast
+with the user object as the argument.
 
 ```javascript
 angular.module('myModule', ['Devise']).
@@ -206,6 +226,10 @@ angular.module('myModule', ['Devise']).
             console.log(registeredUser); // => {id: 1, ect: '...'}
         }, function(error) {
             // Registration failed...
+        });
+
+        $scope.$on('devise:new-registration', function(event, user) {
+            // ...
         });
     });
 ```
@@ -317,15 +341,15 @@ All of these can be configured using a `.config` block in your module.
 ```javascript
 angular.module('myModule', ['Devise']).
     config(function(AuthProvider) {
-        // Customise login
+        // Customize login
         AuthProvider.loginMethod('GET');
         AuthProvider.loginPath('/admins/login.json');
 
-        // Customise logout
+        // Customize logout
         AuthProvider.logoutMethod('POST');
         AuthProvider.logoutPath('/user/logout.json');
 
-        // Customise register
+        // Customize register
         AuthProvider.registerMethod('PATCH');
         AuthProvider.registerPath('/user/sign_up.json');
 

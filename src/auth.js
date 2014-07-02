@@ -95,7 +95,7 @@ devise.provider('Auth', function AuthProvider() {
         };
     }
 
-    this.$get = function($q, $http) {
+    this.$get = function($q, $http, $rootScope) {
         // Our shared save function, called
         // by `then`s. Will return the first argument,
         // unless it is falsey (then it'll return
@@ -107,6 +107,13 @@ devise.provider('Auth', function AuthProvider() {
         // A reset that saves null for currentUser
         function reset() {
             save(null);
+        }
+
+        function broadcast(name) {
+            return function(data) {
+                $rootScope.$broadcast('devise:' + name, data);
+                return data;
+            };
         }
 
         var service = {
@@ -137,8 +144,20 @@ devise.provider('Auth', function AuthProvider() {
              *                  rejected by the server.
              */
             login: function(creds) {
+                var withCredentials = arguments.length > 0,
+                    loggedIn = service.isAuthenticated();
+
                 creds = creds || {};
-                return $http(httpConfig('login', {user: creds})).then(parse).then(save);
+                return $http(httpConfig('login', {user: creds}))
+                    .then(parse)
+                    .then(save)
+                    .then(function(user) {
+                        if (withCredentials && !loggedIn) {
+                            return broadcast('new-session')(user);
+                        }
+                        return user;
+                    })
+                    .then(broadcast('login'));
             },
 
             /**
@@ -158,7 +177,10 @@ devise.provider('Auth', function AuthProvider() {
              */
             logout: function() {
                 var returnOldUser = constant(service._currentUser);
-                return $http(httpConfig('logout')).then(reset).then(returnOldUser);
+                return $http(httpConfig('logout'))
+                    .then(reset)
+                    .then(returnOldUser)
+                    .then(broadcast('logout'));
             },
 
             /**
@@ -182,7 +204,10 @@ devise.provider('Auth', function AuthProvider() {
              */
             register: function(creds) {
                 creds = creds || {};
-                return $http(httpConfig('register', {user: creds})).then(parse).then(save);
+                return $http(httpConfig('register', {user: creds}))
+                    .then(parse)
+                    .then(save)
+                    .then(broadcast('new-registration'));
             },
 
             /**
