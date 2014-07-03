@@ -84,9 +84,9 @@ describe('Provider: Devise.Auth', function () {
             var params = {id: 1, name: 'test', email: 'test@email.com', password: 'password'};
             var callCount = 0;
             var callback = function(user) {
-                ++callCount;
                 expect(user instanceof User).toBe(true);
                 expect(user.params).toEqual(params);
+                ++callCount;
             };
             $httpBackend.expect('POST', '/users/sign_in.json').respond(params);
 
@@ -287,16 +287,22 @@ describe('Provider: Devise.Auth', function () {
             var User = function(params) {
                 this.params = params;
             };
+            var callCount = 0;
+
             Auth.login().then(function(user){
                 expect(user instanceof User).toBe(false);
+                ++callCount;
             });
-            Auth['parse'] = function(response) {
+            Auth.parse = function(response) {
                 return new User(response.data);
-            }
+            };
             Auth.login().then(function(user){
                 expect(user instanceof User).toBe(true);
+                ++callCount;
             });
             $httpBackend.flush();
+
+            expect(callCount).toBe(2);
         });
     });
 
