@@ -36,7 +36,7 @@ devise.provider('Auth', function AuthProvider() {
      *      });
      *  });
      */
-    var parse = function(response) {
+    var _parse = function(response) {
         return response.data;
     };
 
@@ -81,9 +81,9 @@ devise.provider('Auth', function AuthProvider() {
     // The parse configure function.
     this.parse = function(fn) {
         if (typeof fn !== 'function') {
-            return parse;
+            return _parse;
         }
-        parse = fn;
+        _parse = fn;
         return this;
     };
 
@@ -125,6 +125,13 @@ devise.provider('Auth', function AuthProvider() {
             _currentUser: null,
 
             /**
+             * The Auth service's parsing function.
+             * Defaults to the parsing function set in the provider,
+             * but may also be overwritten directly on the service.
+             */
+            parse: _parse,
+
+            /**
              * A login function to authenticate with the server.
              * Keep in mind, credentials are sent in plaintext;
              * use a SSL connection to secure them. By default,
@@ -149,7 +156,7 @@ devise.provider('Auth', function AuthProvider() {
 
                 creds = creds || {};
                 return $http(httpConfig('login', {user: creds}))
-                    .then(parse)
+                    .then(service.parse)
                     .then(save)
                     .then(function(user) {
                         if (withCredentials && !loggedIn) {
@@ -205,7 +212,7 @@ devise.provider('Auth', function AuthProvider() {
             register: function(creds) {
                 creds = creds || {};
                 return $http(httpConfig('register', {user: creds}))
-                    .then(parse)
+                    .then(service.parse)
                     .then(save)
                     .then(broadcast('new-registration'));
             },

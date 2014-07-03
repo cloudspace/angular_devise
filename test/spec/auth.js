@@ -273,6 +273,33 @@ describe('Provider: Devise.Auth', function () {
         });
     });
 
+    describe('.parse', function() {
+        beforeEach(function() {
+            var response = {id: 1, name: 'test', email: 'test@email.com'};
+            $httpBackend.when('POST', '/users/sign_in.json').respond(response);
+        });
+        afterEach(function() {
+            $httpBackend.verifyNoOutstandingExpectation();
+            $httpBackend.verifyNoOutstandingRequest();
+        });
+
+        it('can be customized', function() {
+            var User = function(params) {
+                this.params = params;
+            };
+            Auth.login().then(function(user){
+                expect(user instanceof User).toBe(false);
+            });
+            Auth['parse'] = function(response) {
+                return new User(response.data);
+            }
+            Auth.login().then(function(user){
+                expect(user instanceof User).toBe(true);
+            });
+            $httpBackend.flush();
+        });
+    });
+
     describe('.currentUser', function() {
         describe('when authenticated', function() {
             var user;

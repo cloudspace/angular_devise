@@ -125,8 +125,8 @@ credentials are sent in plaintext; use a SSL connection to secure them.
 `creds` is an object which should contain any credentials needed to
 authenticate with the server. `Auth.login()` will return a promise that
 will resolve to the logged-in user. See
-[AuthProvider.parse()](#authprovider) for parsing the user into a usable
-object.
+[Auth.parse(response)](#authparseresponse) to customize how the response
+is parsed into a user.
 
 Upon a successful login, two events will be broadcast, `devise:login` and
 `devise:session`, both with the currentUser as the argument. New-Session will only
@@ -202,6 +202,39 @@ angular.module('myModule', ['Devise']).
     });
 ```
 
+### Auth.parse(response)
+
+This is the method used to parse the `$http` response into the appropriate
+user object. By default, it simply returns `response.data`. This can be
+customized either by specifying a parse function during configuration:
+
+```javascript
+angular.module('myModule', ['Devise']).
+    config(function(AuthProvider) {
+        // Customize user parsing
+        // NOTE: **MUST** return a truth-y expression
+        AuthProvider.parse(function(response) {
+            return response.data.user;
+        });
+    });
+```
+
+or by directly overwriting it, perhaps when writing a custom version of
+the Auth service which depends on another service:
+
+```javascript
+angular.module('myModule', ['Devise']).
+  factory('User', function() {
+    // Custom user factory
+  }).
+  factory('CustomAuth', function(Auth, User) {
+    Auth['parse'] = function(response) {
+      return new User(response.data);
+    };
+    return Auth;
+  });
+```
+
 ### Auth.register(creds)
 
 Use `Auth.register()` to register and authenticate with the server. Keep
@@ -209,9 +242,9 @@ in mind, credentials are sent in plaintext; use a SSL connection to
 secure them. `creds` is an object that should contain any credentials
 needed to register with the server. `Auth.register()` will return a
 promise that will resolve to the registered user. See
-[AuthProvider.parse()](#authproviderparse) for parsing the user into a
-usable object. Then a `devise:new-registration` event will be broadcast
-with the user object as the argument.
+[Auth.parse(response)](#authparseresponse) to customize how the response
+is parsed into a user. Then a `devise:new-registration` event will be
+broadcast with the user object as the argument.
 
 ```javascript
 angular.module('myModule', ['Devise']).
@@ -330,10 +363,9 @@ By default, AngularDevise uses the following HTTP methods/paths:
 And the following parse function:
 
 ```javascript
-function parse(response) {
-    var user = response.data;
-    return user;
-}
+function(response) {
+    return response.data;
+};
 ```
 
 All of these can be configured using a `.config` block in your module.
@@ -360,7 +392,7 @@ angular.module('myModule', ['Devise']).
         // Customize user parsing
         // NOTE: **MUST** return a truth-y expression
         AuthProvider.parse(function(response) {
-            return new User(response.data);
+            return response.data.user;
         });
     });
 ```
