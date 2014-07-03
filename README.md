@@ -356,17 +356,22 @@ AuthProvider
 ------------
 
 By default, AngularDevise uses the following HTTP methods/paths:
- - **login**: POST /users/sign_in.json
- - **logout**: DELETE /users/sign_out.json
- - **register**: POST /users.json
 
-And the following parse function:
+| Method   | HTTP Method | HTTP Path            |
+| -------- | ----------- | -------------------- |
+| login    | POST        | /users/sign_in.json  |
+| logout   | DELETE      | /users/sign_out.json |
+| register | POST        | /users.json          |
+
+The following parse function:
 
 ```javascript
 function(response) {
     return response.data;
 };
 ```
+
+And will intercept all `401 Unauthorized` responses.
 
 All of these can be configured using a `.config` block in your module.
 
