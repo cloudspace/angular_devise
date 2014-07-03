@@ -64,7 +64,7 @@ currentUser. There are three possible outcomes:
  1. Auth has authenticated a user, and will resolve with that user.
  2. Auth has not authenticated a user but the server has a previously
     authenticated session, Auth will attempt to retrieve that session
-    and resolve with its user. Then, a `devise:session` event
+    and resolve with its user. Then, a `devise:new-session` event
     will be broadcast with the current user as the argument.
  3. Neither Auth nor the server has an authenticated session, and an
     unresolved promise will be returned. (see
@@ -129,7 +129,7 @@ will resolve to the logged-in user. See
 is parsed into a user.
 
 Upon a successful login, two events will be broadcast, `devise:login` and
-`devise:session`, both with the currentUser as the argument. New-Session will only
+`devise:new-session`, both with the currentUser as the argument. New-Session will only
 be broadcast if the user was logged in by `Auth.login({...})`. If the server
 has a previously authenticated session, only the login event will be broadcast.
 
