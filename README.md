@@ -22,10 +22,7 @@ Protection](http://api.rubyonrails.org/classes/ActionController/RequestForgeryPr
 enabled for your controller actions, you will also need to include the
 `X-CSRF-TOKEN` header with the token provided by rails. The easiest way
 to include this is to use the
-[ng-rails-csrf gem](https://github.com/xrd/ng-rails-csrf). You may also
-[setup
-rails](http://stackoverflow.com/questions/14734243/rails-csrf-protection-angular-js-protect-from-forgery-makes-me-to-log-out-on/15761835#15761835)
-to include a `XSRF-TOKEN` cookie, which Angular uses automatically.
+[angular_rails_csrf gem](https://github.com/jsanders/angular_rails_csrf).
 
 Downloading
 -----------
