@@ -90,7 +90,7 @@ devise.provider('Auth', function AuthProvider() {
         }
         _resourceName = value;
         return this;
-    }
+    };
 
     // The parse configure function.
     this.parse = function(fn) {
@@ -170,7 +170,7 @@ devise.provider('Auth', function AuthProvider() {
 
                 creds = creds || {};
                 var resourceObj = {};
-                resourceObj[resourceName()] = creds;
+                resourceObj[_resourceName] = creds;
                 return $http(httpConfig('login', resourceObj))
                     .then(service.parse)
                     .then(save)
@@ -228,7 +228,7 @@ devise.provider('Auth', function AuthProvider() {
             register: function(creds) {
                 creds = creds || {};
                 var resourceObj = {};
-                resourceObj[resourceName()] = creds;
+                resourceObj[_resourceName] = creds;
                 return $http(httpConfig('register', resourceObj))
                     .then(service.parse)
                     .then(save)
