@@ -23,6 +23,11 @@ devise.provider('Auth', function AuthProvider() {
     var ignoreAuth = false;
 
     /**
+     * Default devise resource_name is 'user', can be set to any string.
+     */
+    var _resourceName = 'user';
+
+    /**
      * The parsing function used to turn a $http
      * response into a "user".
      *
@@ -77,6 +82,15 @@ devise.provider('Auth', function AuthProvider() {
         ignoreAuth = !!value;
         return this;
     };
+
+    // The resourceName config function
+    this.resourceName = function(value) {
+        if (value === undefined) {
+            return _resourceName;
+        }
+        _resourceName = value;
+        return this;
+    }
 
     // The parse configure function.
     this.parse = function(fn) {
@@ -155,7 +169,9 @@ devise.provider('Auth', function AuthProvider() {
                     loggedIn = service.isAuthenticated();
 
                 creds = creds || {};
-                return $http(httpConfig('login', {user: creds}))
+                var resourceObj = {};
+                resourceObj[resourceName()] = creds;
+                return $http(httpConfig('login', resourceObj))
                     .then(service.parse)
                     .then(save)
                     .then(function(user) {
@@ -211,7 +227,9 @@ devise.provider('Auth', function AuthProvider() {
              */
             register: function(creds) {
                 creds = creds || {};
-                return $http(httpConfig('register', {user: creds}))
+                var resourceObj = {};
+                resourceObj[resourceName()] = creds;
+                return $http(httpConfig('register', resourceObj))
                     .then(service.parse)
                     .then(save)
                     .then(broadcast('new-registration'));
