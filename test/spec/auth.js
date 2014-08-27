@@ -43,9 +43,52 @@ describe('Provider: Devise.Auth', function () {
             Auth[action]();
             $httpBackend.flush();
         }
+        function testResourceNameConfigure(action, method, path, resourceName) {
+            // default resourceName
+            $httpBackend.expect(method, path, { user: {} }).respond({});
+            Auth[action]();
+            $httpBackend.flush();
+
+            initService(function() {
+                AuthProvider.resourceName(resourceName);
+            })
+            if (resourceName && resourceName.length && resourceName != 'user') {
+              var payLoadData = {}
+              payLoadData[resourceName] = {}
+              $httpBackend.expect(method, path, payLoadData).respond({});
+              Auth[action]();
+              $httpBackend.flush();
+              $httpBackend.verifyNoOutstandingExpectation();
+
+              $httpBackend.expect(method, path, { user: {} }).respond({});
+              Auth[action]();
+              expect($httpBackend.flush).
+                  toThrow('Expected POST ' + path + ' with different data\nEXPECTED: {"user":{}}\nGOT:      {"' + resourceName + '":{}}');
+              $httpBackend.resetExpectations();
+            } else {
+              $httpBackend.expect(method, path, { user: {} }).respond({});
+              Auth[action]();
+              $httpBackend.flush();
+            }
+        }
         afterEach(function() {
             $httpBackend.verifyNoOutstandingExpectation();
             $httpBackend.verifyNoOutstandingRequest();
+        });
+
+        describe('.resourceName', function() {
+          angular.forEach({
+            login: { path: '/users/sign_in.json', method: 'POST' },
+            register: { path: '/users.json', method: 'POST' }
+          }, function(config, action) {
+            describe('for .' + action, function() {
+              angular.forEach([ undefined, null, '', 'user', 'my_user' ], function(resourceName) {
+                it('with resourceName as ' + resourceName, function() {
+                  testResourceNameConfigure(action, config.method, config.path, resourceName);
+                });
+              });
+            });
+          });
         });
 
         it('.loginPath', function() {
@@ -122,54 +165,62 @@ describe('Provider: Devise.Auth', function () {
             return postCallback(data);
         }
 
-        beforeEach(function() {
-            postCallback = constantTrue;
-            user = {id: 1, name: 'test', email: 'test@email.com', password: 'password'};
-            $httpBackend.expect('POST', '/users/sign_in.json', callbackWraper).respond(user);
-        });
-        afterEach(function() {
-            $httpBackend.verifyNoOutstandingExpectation();
-            $httpBackend.verifyNoOutstandingRequest();
-        });
+        angular.forEach([undefined, null, '', 'user', 'my_user'], function(resourceName, i) {
+          describe('with resourceName as ' + (resourceName || 'default'), function() {
+            beforeEach(function() {
+              AuthProvider.resourceName(resourceName);
+              if (!resourceName || !resourceName.length) {
+                resourceName = 'user';
+              }
+              postCallback = constantTrue;
+              user = {id: 1, name: 'test', email: 'test@email.com', password: 'password'};
+              $httpBackend.expect('POST', '/users/sign_in.json', callbackWraper).respond(user);
+            });
+            afterEach(function() {
+              $httpBackend.verifyNoOutstandingExpectation();
+              $httpBackend.verifyNoOutstandingRequest();
+            });
 
-        it('POSTs to /users/sign_in.json', function() {
-            Auth.login();
-            $httpBackend.flush();
-        });
+            it('POSTs to /users/sign_in.json', function() {
+              Auth.login();
+              $httpBackend.flush();
+            });
 
-        it('POSTS credential data', function() {
-            postCallback = function(data) {
-                return jsonEquals(data.user, creds);
-            };
-            Auth.login(creds);
-            $httpBackend.flush();
-        });
+            it('POSTS credential data', function() {
+              postCallback = function(data) {
+                return jsonEquals(data[resourceName], creds);
+              };
+              Auth.login(creds);
+              $httpBackend.flush();
+            });
 
-        it('returns a promise', function() {
-            expect(Auth.login().then).toBeDefined();
-            $httpBackend.flush();
-        });
+            it('returns a promise', function() {
+              expect(Auth.login().then).toBeDefined();
+              $httpBackend.flush();
+            });
 
-        it('resolves promise to currentUser', function() {
-            var callback = jasmine.createSpy('callback');
-            Auth.login().then(callback);
+            it('resolves promise to currentUser', function() {
+              var callback = jasmine.createSpy('callback');
+              Auth.login().then(callback);
 
-            $httpBackend.flush();
+              $httpBackend.flush();
 
-            expect(callback).toHaveBeenCalledWith(user);
-        });
+              expect(callback).toHaveBeenCalledWith(user);
+            });
 
-        it('broadcasts the session event and login events', function() {
-            var loginCallback = jasmine.createSpy('login callback');
-            var sessionCallback = jasmine.createSpy('session callback');
-            $rootScope.$on('devise:new-session', sessionCallback);
-            $rootScope.$on('devise:login', loginCallback);
+            it('broadcasts the session event and login events', function() {
+              var loginCallback = jasmine.createSpy('login callback');
+              var sessionCallback = jasmine.createSpy('session callback');
+              $rootScope.$on('devise:new-session', sessionCallback);
+              $rootScope.$on('devise:login', loginCallback);
 
-            Auth.login(creds);
-            $httpBackend.flush();
+              Auth.login(creds);
+              $httpBackend.flush();
 
-            expect(loginCallback).toHaveBeenCalledWith(jasmine.any(Object), user);
-            expect(sessionCallback).toHaveBeenCalledWith(jasmine.any(Object), user);
+              expect(loginCallback).toHaveBeenCalledWith(jasmine.any(Object), user);
+              expect(sessionCallback).toHaveBeenCalledWith(jasmine.any(Object), user);
+            });
+          });
         });
     });
 
@@ -224,52 +275,60 @@ describe('Provider: Devise.Auth', function () {
             return postCallback(data);
         }
 
-        beforeEach(function() {
-            postCallback = constantTrue;
-            user = {id: 1, name: 'test', email: 'test@email.com', password: 'password'};
-            $httpBackend.expect('POST', '/users.json', callbackWraper).respond(user);
-        });
-        afterEach(function() {
-            $httpBackend.verifyNoOutstandingExpectation();
-            $httpBackend.verifyNoOutstandingRequest();
-        });
+        angular.forEach([undefined, null, '', 'user', 'my_user'], function(resourceName, i) {
+          describe('with resourceName as ' + (resourceName || 'default'), function() {
+            beforeEach(function() {
+              AuthProvider.resourceName(resourceName);
+              if (!resourceName || !resourceName.length) {
+                resourceName = 'user';
+              }
+              postCallback = constantTrue;
+              user = {id: 1, name: 'test', email: 'test@email.com', password: 'password'};
+              $httpBackend.expect('POST', '/users.json', callbackWraper).respond(user);
+            });
+            afterEach(function() {
+              $httpBackend.verifyNoOutstandingExpectation();
+              $httpBackend.verifyNoOutstandingRequest();
+            });
 
-        it('POSTs to /users.json', function() {
-            Auth.register();
-            $httpBackend.flush();
-        });
+            it('POSTs to /users.json', function() {
+              Auth.register();
+              $httpBackend.flush();
+            });
 
-        it('POSTS credential data', function() {
-            var u = {email: 'test', blah: true};
-            postCallback = function(data) {
-                return jsonEquals(data.user, u);
-            };
-            Auth.register(u);
-            $httpBackend.flush();
-        });
+            it('POSTS credential data', function() {
+              var u = {email: 'test', blah: true};
+              postCallback = function(data) {
+                return jsonEquals(data[resourceName], u);
+              };
+              Auth.register(u);
+              $httpBackend.flush();
+            });
 
-        it('returns a promise', function() {
-            expect(Auth.register().then).toBeDefined();
-            $httpBackend.flush();
-        });
+            it('returns a promise', function() {
+              expect(Auth.register().then).toBeDefined();
+              $httpBackend.flush();
+            });
 
-        it('resolves promise to currentUser', function() {
-            var callback = jasmine.createSpy('callback');
-            Auth.register().then(callback);
+            it('resolves promise to currentUser', function() {
+              var callback = jasmine.createSpy('callback');
+              Auth.register().then(callback);
 
-            $httpBackend.flush();
+              $httpBackend.flush();
 
-            expect(callback).toHaveBeenCalledWith(user);
-        });
+              expect(callback).toHaveBeenCalledWith(user);
+            });
 
-        it('broadcasts the new-registration event after a sucessful registration', function() {
-            var callback = jasmine.createSpy('callback');
-            $rootScope.$on('devise:new-registration', callback);
+            it('broadcasts the new-registration event after a sucessful registration', function() {
+              var callback = jasmine.createSpy('callback');
+              $rootScope.$on('devise:new-registration', callback);
 
-            Auth.register();
-            $httpBackend.flush();
+              Auth.register();
+              $httpBackend.flush();
 
-            expect(callback).toHaveBeenCalledWith(jasmine.any(Object), user);
+              expect(callback).toHaveBeenCalledWith(jasmine.any(Object), user);
+            });
+          });
         });
     });
 

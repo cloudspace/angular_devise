@@ -53,7 +53,11 @@ devise.provider('Auth', function AuthProvider() {
             url: paths[action],
             ignoreAuth: ignoreAuth
         };
-        if (data) { config.data = data; }
+        if (data) {
+          var _data = {};
+          _data[_resourceName] = data;
+          config.data = _data;
+        }
         return config;
     }
 
@@ -85,10 +89,7 @@ devise.provider('Auth', function AuthProvider() {
 
     // The resourceName config function
     this.resourceName = function(value) {
-        if (value === undefined) {
-            return _resourceName;
-        }
-        _resourceName = value;
+        _resourceName = value && value.length ? value : 'user';
         return this;
     };
 
@@ -169,9 +170,7 @@ devise.provider('Auth', function AuthProvider() {
                     loggedIn = service.isAuthenticated();
 
                 creds = creds || {};
-                var resourceObj = {};
-                resourceObj[_resourceName] = creds;
-                return $http(httpConfig('login', resourceObj))
+                return $http(httpConfig('login', creds))
                     .then(service.parse)
                     .then(save)
                     .then(function(user) {
@@ -227,9 +226,7 @@ devise.provider('Auth', function AuthProvider() {
              */
             register: function(creds) {
                 creds = creds || {};
-                var resourceObj = {};
-                resourceObj[_resourceName] = creds;
-                return $http(httpConfig('register', resourceObj))
+                return $http(httpConfig('register', creds))
                     .then(service.parse)
                     .then(save)
                     .then(broadcast('new-registration'));
