@@ -5,7 +5,10 @@ devise.provider('Auth', function AuthProvider() {
     var paths = {
         login: '/users/sign_in.json',
         logout: '/users/sign_out.json',
-        register: '/users.json'
+        update: '/users.json',
+        register: '/users.json',
+        sendResetPasswordInstructions: '/users/password.json',
+        resetPassword: '/users/password.json'
     };
 
     /**
@@ -14,7 +17,10 @@ devise.provider('Auth', function AuthProvider() {
     var methods = {
         login: 'POST',
         logout: 'DELETE',
-        register: 'POST'
+        update: 'PUT',
+        register: 'POST',
+        sendResetPasswordInstructions: 'POST',
+        resetPassword: 'PUT'
     };
 
     /**
@@ -115,6 +121,7 @@ devise.provider('Auth', function AuthProvider() {
         // A reset that saves null for currentUser
         function reset() {
             save(null);
+            service._promise = null;
         }
 
         function broadcast(name) {
@@ -138,6 +145,21 @@ devise.provider('Auth', function AuthProvider() {
              * but may also be overwritten directly on the service.
              */
             parse: _parse,
+
+            /**
+             * The Auth service's current promise
+             * This is shared between all instances of Auth
+             * on the scope.
+             */
+            _promise: null,
+
+            /* reset promise and current_user, after call this method all
+             * xhr request will be reprocessed when they will be call
+             */
+            reset: function(){
+                reset();
+                service.currentUser();
+            },
 
             /**
              * A login function to authenticate with the server.
@@ -235,6 +257,86 @@ devise.provider('Auth', function AuthProvider() {
             },
 
             /**
+             * A function to send the reset password instructions to the
+             * user email. Keep in mind, credentials are sent
+             * in plaintext; use a SSL connection to secure them.
+             * By default, `sendResetPasswordInstructions` will POST to '/users/password.json'.
+             *
+             * The path and HTTP method used to send instructions are configurable
+             * using
+             *
+             *  angular.module('myModule', ['Devise']).
+             *  config(function(AuthProvider) {
+             *      AuthProvider.sendResetPasswordInstructionsPath('path/on/server.json');
+             *      AuthProvider.sendResetPasswordInstructionsMethod('POST');
+             *  });
+             *
+             * @param {Object} [creds] A hash containing user email.
+             * @returns {Promise} A $http promise that will be resolved or
+             *                  rejected by the server.
+             */
+            update: function(creds) {
+                creds = creds || {};
+                return $http(httpConfig('update', {user: creds}))
+                    .then(service.parse)
+                    .then(save)
+                    .then(broadcast('update-successfully'));
+            },
+
+            /**
+             * A reset function to reset user password.
+             * Keep in mind, credentials are sent
+             * in plaintext; use a SSL connection to secure them.
+             * By default, `update` will PUT to '/users/password.json'.
+             *
+             * The path and HTTP method used to reset password are configurable
+             * using
+             *
+             *  angular.module('myModule', ['Devise']).
+             *  config(function(AuthProvider) {
+             *      AuthProvider.resetPasswordPath('path/on/server.json');
+             *      AuthProvider.resetPasswordMethod('POST');
+             *  });
+             *
+             * @param {Object} [creds] A hash containing password, password_confirmation and reset_password_token.
+             * @returns {Promise} A $http promise that will be resolved or
+             *                  rejected by the server.
+             */
+            sendResetPasswordInstructions: function(creds) {
+                creds = creds || {};
+                return $http(httpConfig('sendResetPasswordInstructions', {user: creds}))
+                    .then(service.parse)
+                    .then(broadcast('send-reset-password-instructions-successfully'));
+            },
+
+            /**
+             * A update function to update user data
+             * with the server. Keep in mind, credentials are sent
+             * in plaintext; use a SSL connection to secure them.
+             * By default, `update` will PUT to '/users.json'.
+             *
+             * The path and HTTP method used to login are configurable
+             * using
+             *
+             *  angular.module('myModule', ['Devise']).
+             *  config(function(AuthProvider) {
+             *      AuthProvider.updatePath('path/on/server.json');
+             *      AuthProvider.updateMethod('PUT');
+             *  });
+             *
+             * @param {Object} [creds] A hash of user credentials.
+             * @returns {Promise} A $http promise that will be resolved or
+             *                  rejected by the server.
+             */
+            resetPassword: function(creds) {
+                creds = creds || {};
+                return $http(httpConfig('resetPassword', {user: creds}))
+                    .then(service.parse)
+                    .then(save)
+                    .then(broadcast('reset-password-successfully'));
+            },
+
+            /**
              * A helper function that will return a promise with the currentUser.
              * Three different outcomes can happen:
              *  1. Auth has authenticated a user, and will resolve with it
@@ -251,7 +353,10 @@ devise.provider('Auth', function AuthProvider() {
                 if (service.isAuthenticated()) {
                     return $q.when(service._currentUser);
                 }
-                return service.login();
+                if(service._promise == null){
+                    service._promise = service.login();
+                }
+                return service._promise;
             },
 
             /**
