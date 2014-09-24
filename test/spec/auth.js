@@ -289,7 +289,6 @@ describe('Provider: Devise.Auth', function () {
         }
         function callbackWraper(data) {
             data = JSON.parse(data);
-            console.log(data)
             return postCallback(data);
         }
 
