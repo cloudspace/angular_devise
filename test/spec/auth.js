@@ -60,6 +60,10 @@ describe('Provider: Devise.Auth', function () {
             testPathConfigure('register', 'POST');
         });
 
+        it('.update', function() {
+            testPathConfigure('update', 'PUT');
+        });
+
         it('.loginMethod', function() {
             testPathConfigure('login', 'GET', true);
         });
@@ -70,6 +74,10 @@ describe('Provider: Devise.Auth', function () {
 
         it('.registerMethod', function() {
             testPathConfigure('register', 'GET', true);
+        });
+
+        it('.update', function() {
+            testPathConfigure('update', 'GET', true);
         });
 
         it('.parse', function() {
@@ -267,6 +275,67 @@ describe('Provider: Devise.Auth', function () {
             $rootScope.$on('devise:new-registration', callback);
 
             Auth.register();
+            $httpBackend.flush();
+
+            expect(callback).toHaveBeenCalledWith(jasmine.any(Object), user);
+        });
+    });
+
+    describe('.update', function() {
+        var user;
+        var postCallback;
+        function constantTrue() {
+            return true;
+        }
+        function callbackWraper(data) {
+            data = JSON.parse(data);
+            console.log(data)
+            return postCallback(data);
+        }
+
+        beforeEach(function() {
+            postCallback = constantTrue;
+            user = {user: { id: 1, name: 'test', email: 'test@email.com', password: 'password'}};
+            $httpBackend.expect('PUT', '/users.json', callbackWraper).respond(user);
+        });
+        afterEach(function() {
+            $httpBackend.verifyNoOutstandingExpectation();
+            $httpBackend.verifyNoOutstandingRequest();
+        });
+
+        it('PUTs to /users.json', function() {
+            Auth.update();
+            $httpBackend.flush();
+        });
+
+        it('PUTs updated data', function() {
+            var u = {email: 'new_email', name: 'new_name'};
+            postCallback = function(data) {
+                return jsonEquals(data.user, u);
+            };
+            Auth.update(u);
+            $httpBackend.flush();
+        });
+
+        it('returns a promise', function() {
+            expect(Auth.update().then).toBeDefined();
+            $httpBackend.flush();
+        });
+
+        it('resolves promise to currentUser', function() {
+            var callback = jasmine.createSpy('callback');
+            Auth.update().then(callback);
+
+            $httpBackend.flush();
+
+            expect(callback).toHaveBeenCalledWith(user);
+        });
+
+        it('broadcasts the update-successfully event after a sucessful updated', function() {
+            var callback = jasmine.createSpy('callback');
+            $rootScope.$on('devise:update-successfully', callback);
+
+            Auth.update();
             $httpBackend.flush();
 
             expect(callback).toHaveBeenCalledWith(jasmine.any(Object), user);

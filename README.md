@@ -275,6 +275,48 @@ angular.module('myModule', ['Devise']).
     });
 ```
 
+### Auth.update(creds)
+
+Use `Auth.update()` to update user data with the server. Keep
+in mind, credentials are sent in plaintext; use a SSL connection to
+secure them. `creds` is an object that should contain any credentials
+needed to register with the server. `Auth.update()` will return a
+promise that will resolve to the new user data. See
+[Auth.parse(response)](#authparseresponse) to customize how the response
+is parsed into a user. Then a `devise:update-successfully` event will be
+broadcast with the user object as the argument.
+
+```javascript
+angular.module('myModule', ['Devise']).
+    controller('myCtrl', function(Auth) {
+        var credentials = {
+            email: 'user@domain.com',
+            name: 'new_name',
+        };
+
+        Auth.update(credentials).then(function(new_data) {
+            console.log(new_data); // => {id: 1, ect: '...'}
+        }, function(error) {
+            // Updating failed...
+        });
+
+        $scope.$on('devise:update-successfully', function(event, user) {
+            // ...
+        });
+    });
+```
+
+By default, `update` will PUT to '/users.json'. The path and HTTP
+method used to update are configurable using:
+
+```javascript
+angular.module('myModule', ['Devise']).
+    config(function(AuthProvider) {
+        AuthProvider.updatePath('path/on/server.json');
+        AuthProvider.updateMethod('PUT');
+    });
+```
+
 
 Interceptor
 -----------
