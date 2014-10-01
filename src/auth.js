@@ -134,6 +134,13 @@ devise.provider('Auth', function AuthProvider() {
             parse: _parse,
 
             /**
+             * The Auth service's current promise
+             * This is shared between all instances of Auth
+             * on the scope.
+             */
+            _promise: null,
+
+            /**
              * A login function to authenticate with the server.
              * Keep in mind, credentials are sent in plaintext;
              * use a SSL connection to secure them. By default,
@@ -263,7 +270,10 @@ devise.provider('Auth', function AuthProvider() {
                 if (service.isAuthenticated()) {
                     return $q.when(service._currentUser);
                 }
-                return service.login();
+                if(service._promise == null){
+                    service._promise = service.login();
+                }
+                return service._promise;
             },
 
             /**
