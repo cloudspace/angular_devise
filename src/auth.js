@@ -7,7 +7,7 @@ devise.provider('Auth', function AuthProvider() {
         logout: '/users/sign_out.json',
         update: '/users.json',
         register: '/users.json',
-        send_reset_password_instruction: '/users/password.json'
+        sendResetPasswordInstructions: '/users/password.json'
     };
 
     /**
@@ -18,7 +18,7 @@ devise.provider('Auth', function AuthProvider() {
         logout: 'DELETE',
         update: 'PUT',
         register: 'POST',
-        send_reset_password_instruction: 'POST'
+        sendResetPasswordInstructions: 'POST'
     };
 
     /**
@@ -274,12 +274,11 @@ devise.provider('Auth', function AuthProvider() {
              * @returns {Promise} A $http promise that will be resolved or
              *                  rejected by the server.
              */
-            send_reset_password_instruction: function(creds) {
+            sendResetPasswordInstructions: function(creds) {
                 creds = creds || {};
-                return $http(httpConfig('send_reset_password_instruction', {user: creds}))
+                return $http(httpConfig('sendResetPasswordInstructions', {user: creds}))
                     .then(service.parse)
-                    .then(save)
-                    .then(broadcast('send-reset-password-instruction-successfully'));
+                    .then(broadcast('send-reset-password-instructions-successfully'));
             },
 
             /**
