@@ -68,6 +68,10 @@ describe('Provider: Devise.Auth', function () {
             testPathConfigure('sendResetPasswordInstructions', 'POST');
         });
 
+        it('.resetPasswordPath', function() {
+            testPathConfigure('resetPassword', 'PUT');
+        });
+
         it('.loginMethod', function() {
             testPathConfigure('login', 'GET', true);
         });
@@ -86,6 +90,10 @@ describe('Provider: Devise.Auth', function () {
 
         it('.sendResetPasswordInstructionsMethod', function() {
             testPathConfigure('sendResetPasswordInstructions', 'GET', true);
+        });
+
+        it('.resetPasswordMethod', function() {
+            testPathConfigure('resetPassword', 'GET', true);
         });
 
         it('.parse', function() {

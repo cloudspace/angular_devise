@@ -7,7 +7,8 @@ devise.provider('Auth', function AuthProvider() {
         logout: '/users/sign_out.json',
         update: '/users.json',
         register: '/users.json',
-        sendResetPasswordInstructions: '/users/password.json'
+        sendResetPasswordInstructions: '/users/password.json',
+        resetPassword: '/users/password.json'
     };
 
     /**
@@ -18,7 +19,8 @@ devise.provider('Auth', function AuthProvider() {
         logout: 'DELETE',
         update: 'PUT',
         register: 'POST',
-        sendResetPasswordInstructions: 'POST'
+        sendResetPasswordInstructions: 'POST',
+        resetPassword: 'PUT'
     };
 
     /**
@@ -279,6 +281,33 @@ devise.provider('Auth', function AuthProvider() {
                 return $http(httpConfig('sendResetPasswordInstructions', {user: creds}))
                     .then(service.parse)
                     .then(broadcast('send-reset-password-instructions-successfully'));
+            },
+
+            /**
+             * A update function to update user data
+             * with the server. Keep in mind, credentials are sent
+             * in plaintext; use a SSL connection to secure them.
+             * By default, `update` will PUT to '/users.json'.
+             *
+             * The path and HTTP method used to login are configurable
+             * using
+             *
+             *  angular.module('myModule', ['Devise']).
+             *  config(function(AuthProvider) {
+             *      AuthProvider.updatePath('path/on/server.json');
+             *      AuthProvider.updateMethod('PUT');
+             *  });
+             *
+             * @param {Object} [creds] A hash of user credentials.
+             * @returns {Promise} A $http promise that will be resolved or
+             *                  rejected by the server.
+             */
+            resetPassword: function(creds) {
+                creds = creds || {};
+                return $http(httpConfig('resetPassword', {user: creds}))
+                    .then(service.parse)
+                    .then(save)
+                    .then(broadcast('reset-password-successfully'));
             },
 
             /**
