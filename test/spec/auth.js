@@ -60,7 +60,7 @@ describe('Provider: Devise.Auth', function () {
             testPathConfigure('register', 'POST');
         });
 
-        it('.update', function() {
+        it('.updatePath', function() {
             testPathConfigure('update', 'PUT');
         });
 
@@ -76,7 +76,7 @@ describe('Provider: Devise.Auth', function () {
             testPathConfigure('register', 'GET', true);
         });
 
-        it('.update', function() {
+        it('.updateMethod', function() {
             testPathConfigure('update', 'GET', true);
         });
 
