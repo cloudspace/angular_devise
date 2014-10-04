@@ -405,6 +405,66 @@ describe('Provider: Devise.Auth', function () {
         });
     });
 
+    describe('.resetPassword', function() {
+        var user;
+        var postCallback;
+        function constantTrue() {
+            return true;
+        }
+        function callbackWraper(data) {
+            data = JSON.parse(data);
+            return postCallback(data);
+        }
+
+        beforeEach(function() {
+            postCallback = constantTrue;
+            user = {user: { id: 1, name: 'test', email: 'test@email.com', password: 'password'}};
+            $httpBackend.expect('PUT', '/users/password.json', callbackWraper).respond(user);
+        });
+        afterEach(function() {
+            $httpBackend.verifyNoOutstandingExpectation();
+            $httpBackend.verifyNoOutstandingRequest();
+        });
+
+        it('PUTs to /users/password.json', function() {
+            Auth.resetPassword();
+            $httpBackend.flush();
+        });
+
+        it('PUTs updated data', function() {
+            var u = {password: 'new_password', password_confirmation: 'new_password', reset_password_token: 'token'};
+            postCallback = function(data) {
+                return jsonEquals(data.user, u);
+            };
+            Auth.resetPassword(u);
+            $httpBackend.flush();
+        });
+
+        it('returns a promise', function() {
+            expect(Auth.resetPassword().then).toBeDefined();
+            $httpBackend.flush();
+        });
+
+        it('resolves promise to currentUser', function() {
+            var callback = jasmine.createSpy('callback');
+            Auth.resetPassword().then(callback);
+
+            $httpBackend.flush();
+
+            expect(callback).toHaveBeenCalledWith(user);
+        });
+
+        it('broadcasts the reset-password-successfully event after a sucessful resetPassword', function() {
+            var callback = jasmine.createSpy('callback');
+            $rootScope.$on('devise:reset-password-successfully', callback);
+
+            Auth.resetPassword();
+            $httpBackend.flush();
+
+            expect(callback).toHaveBeenCalledWith(jasmine.any(Object), user);
+        });
+    });
+
     describe('.parse', function() {
         beforeEach(function() {
             var response = {id: 1, name: 'test', email: 'test@email.com'};
