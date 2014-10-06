@@ -258,21 +258,21 @@ devise.provider('Auth', function AuthProvider() {
             },
 
             /**
-             * A update function to update user data
-             * with the server. Keep in mind, credentials are sent
+             * A function to send the reset password instructions to the
+             * user email. Keep in mind, credentials are sent
              * in plaintext; use a SSL connection to secure them.
-             * By default, `update` will PUT to '/users.json'.
+             * By default, `sendResetPasswordInstructions` will POST to '/users/password.json'.
              *
-             * The path and HTTP method used to login are configurable
+             * The path and HTTP method used to send instructions are configurable
              * using
              *
              *  angular.module('myModule', ['Devise']).
              *  config(function(AuthProvider) {
-             *      AuthProvider.updatePath('path/on/server.json');
-             *      AuthProvider.updateMethod('PUT');
+             *      AuthProvider.sendResetPasswordInstructionsPath('path/on/server.json');
+             *      AuthProvider.sendResetPasswordInstructionsMethod('POST');
              *  });
              *
-             * @param {Object} [creds] A hash of user credentials.
+             * @param {Object} [creds] A hash containing user email.
              * @returns {Promise} A $http promise that will be resolved or
              *                  rejected by the server.
              */
@@ -284,21 +284,21 @@ devise.provider('Auth', function AuthProvider() {
             },
 
             /**
-             * A update function to update user data
-             * with the server. Keep in mind, credentials are sent
+             * A reset function to reset user password.
+             * Keep in mind, credentials are sent
              * in plaintext; use a SSL connection to secure them.
-             * By default, `update` will PUT to '/users.json'.
+             * By default, `update` will PUT to '/users/password.json'.
              *
-             * The path and HTTP method used to login are configurable
+             * The path and HTTP method used to reset password are configurable
              * using
              *
              *  angular.module('myModule', ['Devise']).
              *  config(function(AuthProvider) {
-             *      AuthProvider.updatePath('path/on/server.json');
-             *      AuthProvider.updateMethod('PUT');
+             *      AuthProvider.resetPasswordPath('path/on/server.json');
+             *      AuthProvider.resetPasswordMethod('POST');
              *  });
              *
-             * @param {Object} [creds] A hash of user credentials.
+             * @param {Object} [creds] A hash containing password, password_confirmation and reset_password_token.
              * @returns {Promise} A $http promise that will be resolved or
              *                  rejected by the server.
              */
