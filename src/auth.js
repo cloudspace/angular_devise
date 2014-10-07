@@ -23,6 +23,12 @@ devise.provider('Auth', function AuthProvider() {
     var ignoreAuth = false;
 
     /**
+     * Default devise resource_name is 'user', can be set to any string.
+     * If it's falsey, it will not namespace the data.
+     */
+    var resourceName = 'user';
+
+    /**
      * The parsing function used to turn a $http
      * response into a "user".
      *
@@ -48,7 +54,16 @@ devise.provider('Auth', function AuthProvider() {
             url: paths[action],
             ignoreAuth: ignoreAuth
         };
-        if (data) { config.data = data; }
+
+        if (data) {
+            if (resourceName) {
+                config.data = {};
+                config.data[resourceName] = data;
+            } else {
+                config.data = data;
+            }
+        }
+
         return config;
     }
 
@@ -75,6 +90,15 @@ devise.provider('Auth', function AuthProvider() {
             return ignoreAuth;
         }
         ignoreAuth = !!value;
+        return this;
+    };
+
+    // The resourceName config function
+    this.resourceName = function(value) {
+        if (value === undefined) {
+            return resourceName;
+        }
+        resourceName = value;
         return this;
     };
 
@@ -155,7 +179,7 @@ devise.provider('Auth', function AuthProvider() {
                     loggedIn = service.isAuthenticated();
 
                 creds = creds || {};
-                return $http(httpConfig('login', {user: creds}))
+                return $http(httpConfig('login', creds))
                     .then(service.parse)
                     .then(save)
                     .then(function(user) {
@@ -211,7 +235,7 @@ devise.provider('Auth', function AuthProvider() {
              */
             register: function(creds) {
                 creds = creds || {};
-                return $http(httpConfig('register', {user: creds}))
+                return $http(httpConfig('register', creds))
                     .then(service.parse)
                     .then(save)
                     .then(broadcast('new-registration'));
