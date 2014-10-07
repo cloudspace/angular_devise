@@ -154,14 +154,16 @@ angular.module('myModule', ['Devise']).
     });
 ```
 
-By default, `login` will POST to '/users/sign_in.json'. The path and
-HTTP method used to login are configurable using:
+By default, `login` will POST to '/users/sign_in.json' using the
+resource name `user`. The path, HTTP method, and resource name used to
+login are configurable using:
 
 ```javascript
 angular.module('myModule', ['Devise']).
     config(function(AuthProvider) {
         AuthProvider.loginPath('path/on/server.json');
         AuthProvider.loginMethod('GET');
+        AuthProvider.resourceName('customer');
     });
 ```
 
@@ -264,14 +266,16 @@ angular.module('myModule', ['Devise']).
     });
 ```
 
-By default, `register` will POST to '/users.json'. The path and HTTP
-method used to register are configurable using:
+By default, `register` will POST to '/users.json' using the resource
+name `user`. The path, HTTP method, and resource name used to register
+are configurable using:
 
 ```javascript
 angular.module('myModule', ['Devise']).
     config(function(AuthProvider) {
         AuthProvider.registerPath('path/on/server.json');
         AuthProvider.registerMethod('GET');
+        AuthProvider.resourceName('customer');
     });
 ```
 
@@ -360,7 +364,8 @@ By default, AngularDevise uses the following HTTP methods/paths:
 | logout   | DELETE      | /users/sign_out.json |
 | register | POST        | /users.json          |
 
-The following parse function:
+All credentials will be under the `users` namespace, and the following
+parse function will be used to parse the response:
 
 ```javascript
 function(response) {
@@ -368,7 +373,7 @@ function(response) {
 };
 ```
 
-And will intercept all `401 Unauthorized` responses.
+Aditionally, it will intercept all `401 Unauthorized` responses.
 
 All of these can be configured using a `.config` block in your module.
 
@@ -390,6 +395,10 @@ angular.module('myModule', ['Devise']).
         // Ignore 401 Unauthorized everywhere
         // Disables `devise:unauthorized` interceptor
         AuthProvider.ignoreAuth(true);
+
+        // Customize the resource name data use namespaced under
+        // Pass false to disable the namespace altogether.
+        AuthProvider.resourceName('customer');
 
         // Customize user parsing
         // NOTE: **MUST** return a truth-y expression
