@@ -121,9 +121,7 @@ devise.provider('Auth', function AuthProvider() {
 
     this.$get = function($q, $http, $rootScope) {
         // Our shared save function, called
-        // by `then`s. Will return the first argument,
-        // unless it is falsey (then it'll return
-        // the second).
+        // by `then`s.
         function save(user) {
             service._currentUser = user;
             return user;
