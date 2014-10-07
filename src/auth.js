@@ -24,8 +24,9 @@ devise.provider('Auth', function AuthProvider() {
 
     /**
      * Default devise resource_name is 'user', can be set to any string.
+     * If it's falsey, it will not namespace the data.
      */
-    var _resourceName = 'user';
+    var resourceName = 'user';
 
     /**
      * The parsing function used to turn a $http
@@ -53,11 +54,16 @@ devise.provider('Auth', function AuthProvider() {
             url: paths[action],
             ignoreAuth: ignoreAuth
         };
+
         if (data) {
-          var _data = {};
-          _data[_resourceName] = data;
-          config.data = _data;
+            if (resourceName) {
+                config.data = {};
+                config.data[resourceName] = data;
+            } else {
+                config.data = data;
+            }
         }
+
         return config;
     }
 
@@ -89,7 +95,10 @@ devise.provider('Auth', function AuthProvider() {
 
     // The resourceName config function
     this.resourceName = function(value) {
-        _resourceName = value && value.length ? value : 'user';
+        if (value === undefined) {
+            return resourceName;
+        }
+        resourceName = value;
         return this;
     };
 
