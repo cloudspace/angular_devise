@@ -113,6 +113,7 @@ devise.provider('Auth', function AuthProvider() {
         // A reset that saves null for currentUser
         function reset() {
             save(null);
+            service._promise = null;
         }
 
         function broadcast(name) {
