@@ -145,6 +145,14 @@ devise.provider('Auth', function AuthProvider() {
              */
             _promise: null,
 
+            /* reset promise and current_user, after call this method all
+             * xhr request will be reprocessed when they will be call
+             */
+            reset: function(){
+                reset();
+                service.currentUser();
+            },
+
             /**
              * A login function to authenticate with the server.
              * Keep in mind, credentials are sent in plaintext;
