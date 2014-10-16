@@ -132,6 +132,59 @@ describe('Provider: Devise.Auth', function () {
 
             expect(callback).toHaveBeenCalled();
         });
+
+        describe('.resourceName', function() {
+            var credentials = {test: 'test'};
+            afterEach(function() {
+                $httpBackend.verifyNoOutstandingExpectation();
+                $httpBackend.verifyNoOutstandingRequest();
+            });
+
+            describe('truthy resourceName', function() {
+                it('.login', function() {
+                    initService(function() {
+                        AuthProvider.resourceName('test');
+                    });
+                    $httpBackend.expect('POST', '/users/sign_in.json', {test: credentials}).respond({});
+
+                    Auth.login({test: 'test'});
+                    $httpBackend.flush();
+                });
+
+                it('.register', function() {
+                    initService(function() {
+                        AuthProvider.resourceName('test');
+                    });
+                    $httpBackend.expect('POST', '/users.json', {test: credentials}).respond({});
+
+                    Auth.register({test: 'test'});
+                    $httpBackend.flush();
+                });
+            });
+
+            describe('falsey resourceName', function() {
+                it('.login', function() {
+                    initService(function() {
+                        AuthProvider.resourceName(false);
+                    });
+                    $httpBackend.expect('POST', '/users/sign_in.json', credentials).respond({});
+
+                    Auth.login({test: 'test'});
+                    $httpBackend.flush();
+                });
+
+                it('.register', function() {
+                    initService(function() {
+                        AuthProvider.resourceName(false);
+                    });
+                    $httpBackend.expect('POST', '/users.json', credentials).respond({});
+
+                    Auth.register({test: 'test'});
+                    $httpBackend.flush();
+                });
+            });
+        });
+
     });
 
     describe('.login', function() {
