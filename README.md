@@ -279,6 +279,127 @@ angular.module('myModule', ['Devise']).
     });
 ```
 
+### Auth.update(creds)
+
+Use `Auth.update()` to update user data with the server. Keep
+in mind, credentials are sent in plaintext; use a SSL connection to
+secure them. `creds` is an object that should contain any credentials
+needed to register with the server. `Auth.update()` will return a
+promise that will resolve to the new user data. See
+[Auth.parse(response)](#authparseresponse) to customize how the response
+is parsed into a user. Then a `devise:update-successfully` event will be
+broadcast with the user object as the argument.
+
+```javascript
+angular.module('myModule', ['Devise']).
+    controller('myCtrl', function(Auth) {
+        var credentials = {
+            email: 'user@domain.com',
+            name: 'new_name',
+        };
+
+        Auth.update(credentials).then(function(new_data) {
+            console.log(new_data); // => {id: 1, ect: '...'}
+        }, function(error) {
+            // Updating failed...
+        });
+
+        $scope.$on('devise:update-successfully', function(event, user) {
+            // ...
+        });
+    });
+```
+
+By default, `update` will PUT to '/users.json'. The path and HTTP
+method used to update are configurable using:
+
+```javascript
+angular.module('myModule', ['Devise']).
+    config(function(AuthProvider) {
+        AuthProvider.updatePath('path/on/server.json');
+        AuthProvider.updateMethod('PUT');
+    });
+```
+
+
+### Auth.sendResetPasswordInstructions(creds)
+
+Use `Auth.sendResetPasswordInstructions()` to send reset password mail to user. Keep
+in mind, credentials are sent in plaintext; use a SSL connection to
+secure them. `creds` is an object that should contain the email associated with the user.
+`Auth.sendResetPasswordInstructions()` will return a promise with no params.
+Then a `devise:send-reset-password-instructions-successfully` event will be broadcast.
+
+```javascript
+angular.module('myModule', ['Devise']).
+    controller('myCtrl', function(Auth) {
+        var parameters = {
+            email: 'user@domain.com'
+        };
+
+        Auth.sendResetPasswordInstructions(parameters).then(function() {
+            // Sended email if user found otherwise email not sended...
+        });
+
+        $scope.$on('devise:send-reset-password-instructions-successfully', function(event) {
+            // ...
+        });
+    });
+```
+
+By default, `sendResetPasswordInstructions` will POST to '/users/password.json'. The path and HTTP
+method used to send the reset password instructions are configurable using:
+
+```javascript
+angular.module('myModule', ['Devise']).
+    config(function(AuthProvider) {
+        AuthProvider.sendResetPasswordInstructionsPath('path/on/server.json');
+        AuthProvider.sendResetPasswordInstructionsMethod('POST');
+    });
+```
+
+### Auth.resetPassword(creds)
+
+Use `Auth.resetPassword()` to reset user password. Keep
+in mind, credentials are sent in plaintext; use a SSL connection to
+secure them. `creds` is an object that should contain password, password_confirmation and reset_password_token.
+`Auth.resetPassword()` will return a
+promise that will resolve to the new user data. See
+[Auth.parse(response)](#authparseresponse) to customize how the response
+is parsed into a user. Then a `devise:reset-password-successfully` event will be broadcast.
+
+```javascript
+angular.module('myModule', ['Devise']).
+    controller('myCtrl', function(Auth) {
+        var parameters = {
+            password: 'new_password',
+            password_confirmation: 'new_password',
+            reset_password_token: 'reset_token',
+        };
+
+        Auth.resetPassword(parameters).then(function(new_data) {
+            console.log(new_data); // => {id: 1, ect: '...'}
+        }, function(error) {
+            // Reset password failed...
+        });
+
+        $scope.$on('devise:reset-password-successfully', function(event) {
+            // ...
+        });
+    });
+```
+
+By default, `resetPassword` will PUT to '/users/password.json'. The path and HTTP
+method used to reset password are configurable using:
+
+```javascript
+angular.module('myModule', ['Devise']).
+    config(function(AuthProvider) {
+        AuthProvider.resetPasswordPath('path/on/server.json');
+        AuthProvider.resetPasswordMethod('PUT');
+    });
+```
+
 
 Interceptor
 -----------
