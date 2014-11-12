@@ -54,10 +54,14 @@ module.exports = function(grunt) {
             }
         },
 
-        ngmin: {
+        ngAnnotate: {
+            options: {
+                singleQuotes: true
+            },
             dist: {
-                src: 'lib/devise.js',
-                dest: 'lib/devise.js'
+                files: {
+                    'lib/devise.js': ['lib/devise.js']
+                }
             }
         },
 
@@ -84,7 +88,7 @@ module.exports = function(grunt) {
         grunt.task.run('karma:' + type);
     });
     grunt.registerTask('travis', ['jshint:devise', 'karma']);
-    grunt.registerTask('build', ['default', 'preprocess', 'ngmin', 'uglify']);
+    grunt.registerTask('build', ['default', 'preprocess', 'ngAnnotate', 'uglify']);
     grunt.registerTask('default', ['jshint:devise', 'test']);
 
 };
