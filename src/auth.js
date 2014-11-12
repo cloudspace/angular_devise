@@ -20,7 +20,7 @@ devise.provider('Auth', function AuthProvider() {
     /**
      * Set to true if 401 interception of the provider is not desired
      */
-    var ignoreAuth = false;
+    var interceptAuth = false;
 
     /**
      * Default devise resource_name is 'user', can be set to any string.
@@ -52,7 +52,7 @@ devise.provider('Auth', function AuthProvider() {
         var config = {
             method: methods[action].toLowerCase(),
             url: paths[action],
-            ignoreAuth: ignoreAuth
+            interceptAuth: interceptAuth
         };
 
         if (data) {
@@ -84,12 +84,12 @@ devise.provider('Auth', function AuthProvider() {
     configure.call(this, methods, 'Method');
     configure.call(this, paths, 'Path');
 
-    // The ignoreAuth config function
-    this.ignoreAuth = function(value) {
+    // The interceptAuth config function
+    this.interceptAuth = function(value) {
         if (value === undefined) {
-            return ignoreAuth;
+            return interceptAuth;
         }
-        ignoreAuth = !!value;
+        interceptAuth = !!value;
         return this;
     };
 

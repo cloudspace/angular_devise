@@ -16,27 +16,16 @@ describe('Service: Devise.401', function () {
             $httpBackend.expect('GET', '/foo').respond(401);
         });
 
-        describe('when ignoreAuth is true', function() {
+        describe('when interceptAuth is true', function() {
             beforeEach(function() {
                 var get = $http.get;
                 $http.get = function(url, config) {
                     if (!config) { config = {}; }
-                    config.ignoreAuth = true;
+                    config.interceptAuth = true;
                     return get.call($http, url, config);
                 };
             });
 
-            it('returns rejected promise on 401', function () {
-                var callback = jasmine.createSpy('callback');
-                $http.get('/foo').catch(function() {
-                    callback();
-                });
-                $httpBackend.flush();
-                expect(callback).toHaveBeenCalled();
-            });
-        });
-
-        describe('when ignoreAuth is false (default)', function() {
             it('broadcasts "devise:unauthorized" on 401 error', inject(function ($rootScope) {
                 var callback = jasmine.createSpy('callback');
                 $rootScope.$on('devise:unauthorized', callback);
@@ -84,6 +73,15 @@ describe('Service: Devise.401', function () {
 
                 expect(ret).toBe(data);
             }));
+        });
+
+        describe('when interceptAuth is false (default)', function() {
+            it('returns rejected promise on 401', function () {
+                var callback = jasmine.createSpy('callback');
+                $http.get('/foo').catch(callback);
+                $httpBackend.flush();
+                expect(callback).toHaveBeenCalled();
+            });
         });
     });
 
