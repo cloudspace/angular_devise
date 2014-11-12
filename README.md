@@ -61,11 +61,11 @@ currentUser. There are three possible outcomes:
  1. Auth has authenticated a user, and will resolve with that user.
  2. Auth has not authenticated a user but the server has a previously
     authenticated session, Auth will attempt to retrieve that session
-    and resolve with its user. Then, a `devise:new-session` event
-    will be broadcast with the current user as the argument.
- 3. Neither Auth nor the server has an authenticated session, and an
-    unresolved promise will be returned. (see
-    [Interceptor](#interceptor) for rationale.)
+    and resolve with its user. Then, a `devise:new-session` event will
+    be broadcast with the current user as the argument.
+ 3. Neither Auth nor the server has an authenticated session, and a
+    rejected promise will be returned. (see [Interceptor](#interceptor)
+    for for custom handling.)
 
 ```javascript
 angular.module('myModule', ['Devise']).
@@ -283,11 +283,11 @@ angular.module('myModule', ['Devise']).
 Interceptor
 -----------
 
-AngularDevise creates an [$http
+AngularDevise comes with a [$http
 Interceptor](http://docs.angularjs.org/api/ng.$http#description_interceptors)
-that listens for `401 Unauthorized` response codes. Its purpose is to
-catch unauthorized requests on-the-fly and seamlessly recover. When it
-catches a 401, it will:
+that may be enabled using the `interceptAuth` config. Its purpose is to
+listen for `401 Unauthorized` responses and give you the ability to
+seamlessly recover. When it catches a 401, it will:
  1. create a deferred
  2. broadcast a `devise:unauthorized` event passing:
     - the ajax response
@@ -316,7 +316,7 @@ angular.module('myModule', []).
                 // Resolve the original request's promise.
                 deferred.resolve(response);
             }, function(error) {
-                // There was an error.
+                // There was an error logging in.
                 // Reject the original request's promise.
                 deferred.reject(error);
             });
@@ -325,7 +325,9 @@ angular.module('myModule', []).
         // Request requires authorization
         // Will cause a `401 Unauthorized` response,
         // that will be recovered by our listener above.
-        $http.delete('/users/1').then(function(response) {
+        $http.delete('/users/1', {
+            interceptAuth: true
+        }).then(function(response) {
             // Deleted user 1
         }, function(error) {
             // Something went wrong.
@@ -333,20 +335,20 @@ angular.module('myModule', []).
     });
 ```
 
-The Interceptor can be disabled globally or on a per-request basis using the
-`ignoreAuth` setting.
+The Interceptor can be enabled globally or on a per-request basis using the
+`interceptAuth` setting.
 
 ```javascript
 angular.module('myModule', ['Devise']).
     config(function(AuthProvider) {
-        // Ignore 401 Unauthorized everywhere
-        AuthProvider.ignoreAuth(true);
+        // Intercept 401 Unauthorized everywhere
+        AuthProvider.interceptAuth(true);
     }).
     controller('myCtrl', function($http) {
-        // Enable per-request
+        // Disable per-request
         $http({
             url: '/',
-            ignoreAuth: false,
+            interceptAuth: false,
             // ...
         });
     });
@@ -373,8 +375,6 @@ function(response) {
 };
 ```
 
-Aditionally, it will intercept all `401 Unauthorized` responses.
-
 All of these can be configured using a `.config` block in your module.
 
 ```javascript
@@ -392,9 +392,9 @@ angular.module('myModule', ['Devise']).
         AuthProvider.registerMethod('PATCH');
         AuthProvider.registerPath('/user/sign_up.json');
 
-        // Ignore 401 Unauthorized everywhere
-        // Disables `devise:unauthorized` interceptor
-        AuthProvider.ignoreAuth(true);
+        // Intercept 401 Unauthorized everywhere
+        // Enables `devise:unauthorized` interceptor
+        AuthProvider.interceptAuth(true);
 
         // Customize the resource name data use namespaced under
         // Pass false to disable the namespace altogether.
