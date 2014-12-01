@@ -96,22 +96,6 @@ describe('Provider: Devise.Auth', function () {
             expect(callCount).toBe(1);
         });
 
-        it('.interceptAuth', function() {
-            initService(function() {
-                AuthProvider.interceptAuth(true);
-            });
-            var eventCallback = jasmine.createSpy('event');
-            var promiseOnRejected = jasmine.createSpy('promiseOnRejected');
-            $httpBackend.expect('POST', '/users/sign_in.json').respond(401);
-
-            $rootScope.$on('devise:unauthorized', eventCallback);
-            Auth.login().catch(promiseOnRejected);
-            $httpBackend.flush();
-
-            expect(eventCallback).toHaveBeenCalled();
-            expect(promiseOnRejected).not.toHaveBeenCalled();
-        });
-
         describe('.resourceName', function() {
             var credentials = {test: 'test'};
             afterEach(function() {

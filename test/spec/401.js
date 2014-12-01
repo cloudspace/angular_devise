@@ -4,6 +4,11 @@ describe('Service: Devise.401', function () {
 
     // load the service's module
     beforeEach(module('Devise'));
+    var AuthInterceptProvider;
+    // load the service's module
+    beforeEach(module('Devise', function(_AuthInterceptProvider_) {
+        AuthInterceptProvider = _AuthInterceptProvider_;
+    }));
 
     var $http, $httpBackend;
     beforeEach(inject(function(_$http_, _$httpBackend_) {
@@ -18,13 +23,19 @@ describe('Service: Devise.401', function () {
 
         describe('when interceptAuth is true', function() {
             beforeEach(function() {
-                var get = $http.get;
-                $http.get = function(url, config) {
-                    if (!config) { config = {}; }
-                    config.interceptAuth = true;
-                    return get.call($http, url, config);
-                };
+                AuthInterceptProvider.interceptAuth();
             });
+            afterEach(function() {
+                AuthInterceptProvider.interceptAuth(false);
+            });
+
+            it('can be disabled per request', inject(function ($rootScope) {
+                var callback = jasmine.createSpy('callback');
+                $rootScope.$on('devise:unauthorized', callback);
+                $http.get('/foo', { interceptAuth: false });
+                $httpBackend.flush();
+                expect(callback).not.toHaveBeenCalled();
+            }));
 
             it('broadcasts "devise:unauthorized" on 401 error', inject(function ($rootScope) {
                 var callback = jasmine.createSpy('callback');

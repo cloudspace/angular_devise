@@ -18,11 +18,6 @@ devise.provider('Auth', function AuthProvider() {
     };
 
     /**
-     * Set to true if 401 interception of the provider is not desired
-     */
-    var interceptAuth = false;
-
-    /**
      * Default devise resource_name is 'user', can be set to any string.
      * If it's falsey, it will not namespace the data.
      */
@@ -51,8 +46,7 @@ devise.provider('Auth', function AuthProvider() {
     function httpConfig(action, data) {
         var config = {
             method: methods[action].toLowerCase(),
-            url: paths[action],
-            interceptAuth: interceptAuth
+            url: paths[action]
         };
 
         if (data) {
@@ -83,15 +77,6 @@ devise.provider('Auth', function AuthProvider() {
     }
     configure.call(this, methods, 'Method');
     configure.call(this, paths, 'Path');
-
-    // The interceptAuth config function
-    this.interceptAuth = function(value) {
-        if (value === undefined) {
-            return interceptAuth;
-        }
-        interceptAuth = !!value;
-        return this;
-    };
 
     // The resourceName config function
     this.resourceName = function(value) {

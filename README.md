@@ -336,13 +336,13 @@ angular.module('myModule', []).
 ```
 
 The Interceptor can be enabled globally or on a per-request basis using the
-`interceptAuth` setting.
+`interceptAuth` setting on the AuthIntercept provider.
 
 ```javascript
 angular.module('myModule', ['Devise']).
-    config(function(AuthProvider) {
+    config(function(AuthInterceptProvider) {
         // Intercept 401 Unauthorized everywhere
-        AuthProvider.interceptAuth(true);
+        AuthInterceptProvider.interceptAuth(true);
     }).
     controller('myCtrl', function($http) {
         // Disable per-request
@@ -379,7 +379,7 @@ All of these can be configured using a `.config` block in your module.
 
 ```javascript
 angular.module('myModule', ['Devise']).
-    config(function(AuthProvider) {
+    config(function(AuthProvider, AuthInterceptProvider) {
         // Customize login
         AuthProvider.loginMethod('GET');
         AuthProvider.loginPath('/admins/login.json');
@@ -392,10 +392,6 @@ angular.module('myModule', ['Devise']).
         AuthProvider.registerMethod('PATCH');
         AuthProvider.registerPath('/user/sign_up.json');
 
-        // Intercept 401 Unauthorized everywhere
-        // Enables `devise:unauthorized` interceptor
-        AuthProvider.interceptAuth(true);
-
         // Customize the resource name data use namespaced under
         // Pass false to disable the namespace altogether.
         AuthProvider.resourceName('customer');
@@ -405,6 +401,10 @@ angular.module('myModule', ['Devise']).
         AuthProvider.parse(function(response) {
             return response.data.user;
         });
+
+        // Intercept 401 Unauthorized everywhere
+        // Enables `devise:unauthorized` interceptor
+        AuthInterceptProvider.interceptAuth(true);
     });
 ```
 
