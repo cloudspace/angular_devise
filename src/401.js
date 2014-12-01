@@ -16,9 +16,9 @@ devise.provider('AuthIntercept', function AuthInterceptProvider() {
             responseError: function(response) {
                 // Determine if the response is specifically disabling the interceptor.
                 var intercept = response.config.interceptAuth;
-                intercept = !!intercept || intercept === void 0;
+                intercept = !!intercept || (interceptAuth && intercept === void 0);
 
-                if (interceptAuth && intercept && response.status === 401) {
+                if (intercept && response.status === 401) {
                     var deferred = $q.defer();
                     $rootScope.$broadcast('devise:unauthorized', response, deferred);
                     return deferred.promise;

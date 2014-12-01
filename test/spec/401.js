@@ -93,6 +93,15 @@ describe('Service: Devise.401', function () {
                 $httpBackend.flush();
                 expect(callback).toHaveBeenCalled();
             });
+
+            it('can be enabled per request', inject(function ($rootScope) {
+                var callback = jasmine.createSpy('callback');
+                $rootScope.$on('devise:unauthorized', callback);
+                $http.get('/foo', { interceptAuth: true });
+                $httpBackend.flush();
+                expect(callback).toHaveBeenCalled();
+            }));
+
         });
     });
 
