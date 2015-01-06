@@ -39,7 +39,7 @@ You can then use the main file at `angular-devise/lib/devise-min.js`.
 Rails Assets
 ------------
 
-To get AngularDevise via RailsAssets add to your Gemfile:
+To get AngularDevise via [Rails Assets](https://rails-assets.org/) add to your Gemfile:
 
 ```ruby
 source "https://rails-assets.org" do
