@@ -37,7 +37,7 @@ bower install --save angular-devise
 You can then use the main file at `angular-devise/lib/devise-min.js`.
 
 Rails Assets
-____________
+------------
 
 To get AngularDevise via RailsAssets add to your Gemfile:
 
