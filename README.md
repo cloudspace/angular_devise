@@ -24,6 +24,14 @@ enabled for your controller actions, you will also need to include the
 to include this is to use the
 [angular_rails_csrf gem](https://github.com/jsanders/angular_rails_csrf).
 
+Or if you do not want install any gems, you can do something like:
+
+```javascript
+app.config(function($httpProvider) {
+   token = $("meta[name=\"csrf-token\"]").attr("content")
+   $httpProvider.defaults.headers.common["X-CSRF-TOKEN"] = token
+})
+```
 Downloading
 -----------
 
