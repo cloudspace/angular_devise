@@ -50,7 +50,7 @@ end
 Then `bundle`. Finally, to require the JS:
 
 ```js
-//= require angular-devise/devise
+//= require angular-devise/lib/devise
 ```
 
 Usage
