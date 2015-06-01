@@ -43,7 +43,7 @@ devise.provider('Auth', function AuthProvider() {
 
     // A helper function that will setup the ajax config
     // and merge the data key if provided
-    function httpConfig(action, data, interceptAuth) {
+    function httpConfig(action, data, additionalConfig) {
         var config = {
             method: methods[action].toLowerCase(),
             url: paths[action]
@@ -58,8 +58,8 @@ devise.provider('Auth', function AuthProvider() {
             }
         }
       
-        if (interceptAuth !== undefined) {
-            config.interceptAuth = interceptAuth;
+        if (additionalConfig !== undefined && additionalConfig.interceptAuth !== undefined) {
+            config.interceptAuth = additionalConfig.interceptAuth;
         }
 
         return config;
@@ -158,16 +158,16 @@ devise.provider('Auth', function AuthProvider() {
              *  });
              *
              * @param {Object} [creds] A hash of user credentials.
-             * @param {Boolean} [interceptAuth] Optional, interceptAuth option for underlying $http.
+             * @param {Object} [additionalConfig] Optional, additional config which will be added to http config for underlying $http.
              * @returns {Promise} A $http promise that will be resolved or
              *                  rejected by the server.
              */
-            login: function(creds, interceptAuth) {
+            login: function(creds, additionalConfig) {
                 var withCredentials = arguments.length > 0,
                     loggedIn = service.isAuthenticated();
 
                 creds = creds || {};
-                return $http(httpConfig('login', creds, interceptAuth))
+                return $http(httpConfig('login', creds, additionalConfig))
                     .then(service.parse)
                     .then(save)
                     .then(function(user) {
@@ -191,13 +191,13 @@ devise.provider('Auth', function AuthProvider() {
              *      AuthProvider.logoutPath('path/on/server.json');
              *      AuthProvider.logoutMethod('GET');
              *  });
-             * @param {Boolean} [interceptAuth] Optional, interceptAuth option for underlying $http.
+             * @param {Object} [additionalConfig] Optional, additional config which will be added to http config for underlying $http.
              * @returns {Promise} A $http promise that will be resolved or
              *                  rejected by the server.
              */
-            logout: function(interceptAuth) {
+            logout: function(additionalConfig) {
                 var returnOldUser = constant(service._currentUser);
-                return $http(httpConfig('logout', undefined, interceptAuth))
+                return $http(httpConfig('logout', undefined, additionalConfig))
                     .then(reset)
                     .then(returnOldUser)
                     .then(broadcast('logout'));
@@ -219,13 +219,13 @@ devise.provider('Auth', function AuthProvider() {
              *  });
              *
              * @param {Object} [creds] A hash of user credentials.
-             * @param {Boolean} [interceptAuth] Optional, interceptAuth option for underlying $http.
+             * @param {Object} [additionalConfig] Optional, additional config which will be added to http config for underlying $http.
              * @returns {Promise} A $http promise that will be resolved or
              *                  rejected by the server.
              */
-            register: function(creds, interceptAuth) {
+            register: function(creds, additionalConfig) {
                 creds = creds || {};
-                return $http(httpConfig('register', creds, interceptAuth))
+                return $http(httpConfig('register', creds, additionalConfig))
                     .then(service.parse)
                     .then(save)
                     .then(broadcast('new-registration'));
