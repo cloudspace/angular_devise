@@ -211,6 +211,13 @@ describe('Provider: Devise.Auth', function () {
             expect(loginCallback).toHaveBeenCalledWith(jasmine.any(Object), user);
             expect(sessionCallback).toHaveBeenCalledWith(jasmine.any(Object), user);
         });
+        
+        it('sends additional confing to underlying $http', function() {
+            Auth.login(user, {interceptAuth: true});
+            //$httpBackend.expect('POST', '/users/sign_in.json', callbackWraper).respond(user);
+            //console.log(.getInterceptAuth());
+            $httpBackend.flush();
+        });
     });
 
     describe('.logout', function() {
