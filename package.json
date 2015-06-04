@@ -1,6 +1,6 @@
 {
     "name": "AngularDevise",
-    "version": "1.0.2",
+    "version": "1.1.0",
     "description": "A small AngularJS Service to interact with Devise Authentication.",
     "main": "lib/devise.js",
     "scripts": {
