@@ -24,6 +24,9 @@ describe('Provider: Devise.Auth', function () {
     function jsonEquals(obj, other) {
         return JSON.stringify(obj) === JSON.stringify(other);
     }
+    function constantTrue() {
+        return true;
+    }
 
     describe('can configure', function() {
         function initService(fn) {
@@ -153,19 +156,19 @@ describe('Provider: Devise.Auth', function () {
     describe('.login', function() {
         var user;
         var creds = {email: 'test', blah: true};
-        var postCallback;
-        function constantTrue() {
-            return true;
-        }
+        var postCallback, headerCallback;
         function callbackWraper(data) {
             data = JSON.parse(data);
             return postCallback(data);
         }
+        function headerWrapper(headers) {
+            return headerCallback(headers);
+        }
 
         beforeEach(function() {
-            postCallback = constantTrue;
+            headerCallback = postCallback = constantTrue;
             user = {id: 1, name: 'test', email: 'test@email.com', password: 'password'};
-            $httpBackend.expect('POST', '/users/sign_in.json', callbackWraper).respond(user);
+            $httpBackend.expect('POST', '/users/sign_in.json', callbackWraper, headerWrapper).respond(user);
         });
         afterEach(function() {
             $httpBackend.verifyNoOutstandingExpectation();
@@ -211,18 +214,26 @@ describe('Provider: Devise.Auth', function () {
             expect(loginCallback).toHaveBeenCalledWith(jasmine.any(Object), user);
             expect(sessionCallback).toHaveBeenCalledWith(jasmine.any(Object), user);
         });
-        
-        it('sends additional confing to underlying $http', function() {
-            Auth.login(user, {interceptAuth: true});
-            //$httpBackend.expect('POST', '/users/sign_in.json', callbackWraper).respond(user);
-            //console.log(.getInterceptAuth());
+
+        it('sends additional config to underlying $http', function() {
+            headerCallback = function(headers) {
+                return headers.test;
+            };
+            var headers = { test: true };
+            Auth.login(user, {headers: headers});
             $httpBackend.flush();
         });
     });
 
     describe('.logout', function() {
+        var headerCallback;
+        function headerWrapper(headers) {
+            return headerCallback(headers);
+        }
+
         beforeEach(function() {
-            $httpBackend.expect('DELETE', '/users/sign_out.json').respond({});
+            headerCallback = constantTrue;
+            $httpBackend.expect('DELETE', '/users/sign_out.json', null, headerWrapper).respond({});
         });
         afterEach(function() {
             $httpBackend.verifyNoOutstandingExpectation();
@@ -258,23 +269,32 @@ describe('Provider: Devise.Auth', function () {
 
             expect(callback).toHaveBeenCalled();
         });
+
+        it('sends additional config to underlying $http', function() {
+            headerCallback = function(headers) {
+                return headers.test;
+            };
+            var headers = { test: true };
+            Auth.logout({headers: headers});
+            $httpBackend.flush();
+        });
     });
 
     describe('.register', function() {
         var user;
-        var postCallback;
-        function constantTrue() {
-            return true;
-        }
+        var postCallback, headerCallback;
         function callbackWraper(data) {
             data = JSON.parse(data);
             return postCallback(data);
         }
+        function headerWrapper(headers) {
+            return headerCallback(headers);
+        }
 
         beforeEach(function() {
-            postCallback = constantTrue;
+            headerCallback = postCallback = constantTrue;
             user = {id: 1, name: 'test', email: 'test@email.com', password: 'password'};
-            $httpBackend.expect('POST', '/users.json', callbackWraper).respond(user);
+            $httpBackend.expect('POST', '/users.json', callbackWraper, headerWrapper).respond(user);
         });
         afterEach(function() {
             $httpBackend.verifyNoOutstandingExpectation();
@@ -317,6 +337,15 @@ describe('Provider: Devise.Auth', function () {
             $httpBackend.flush();
 
             expect(callback).toHaveBeenCalledWith(jasmine.any(Object), user);
+        });
+
+        it('sends additional config to underlying $http', function() {
+            headerCallback = function(headers) {
+                return headers.test;
+            };
+            var headers = { test: true };
+            Auth.register(null, {headers: headers});
+            $httpBackend.flush();
         });
     });
 
