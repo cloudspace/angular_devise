@@ -14,10 +14,10 @@
       "name": "Justin Ridgewell"
   },
   "dependencies": {
-      "angular": ">=1.2.0 <1.4.0"
+      "angular": "^1.2.0"
   },
   "devDependencies": {
-      "angular-mocks": ">=1.2.0 <1.4.0",
-      "angular-scenario": ">=1.2.0 <1.4.0"
+      "angular-mocks": "^1.2.0",
+      "angular-scenario": "^1.2.0"
   }
 }
