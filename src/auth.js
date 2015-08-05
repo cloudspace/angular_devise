@@ -1,8 +1,19 @@
 devise.provider('Auth', function AuthProvider() {
     /**
      * The default paths.
+     *
+     * Paths can be customized. F.e.:
+     *
+     * angular.module('myModule', ['Devise']).
+     *  config(function(AuthProvider) {
+     *    AuthProvider.paths({
+     *      login: '/api/users/sign_in.json',
+     *      logout: '/api/users/sign_out.json',
+     *      register: '/api/users.json'
+     *    });
+     *  });
      */
-    var paths = {
+    var _paths = {
         login: '/users/sign_in.json',
         logout: '/users/sign_out.json',
         register: '/users.json'
@@ -46,7 +57,7 @@ devise.provider('Auth', function AuthProvider() {
     function httpConfig(action, data, additionalConfig) {
         var config = {
             method: methods[action].toLowerCase(),
-            url: paths[action]
+            url: _paths[action]
         };
 
         if (data) {
@@ -77,7 +88,7 @@ devise.provider('Auth', function AuthProvider() {
         }, this);
     }
     configure.call(this, methods, 'Method');
-    configure.call(this, paths, 'Path');
+    configure.call(this, _paths, 'Path');
 
     // The resourceName config function
     this.resourceName = function(value) {
@@ -95,6 +106,12 @@ devise.provider('Auth', function AuthProvider() {
         }
         _parse = fn;
         return this;
+    };
+
+    // The paths configuration.
+    this.paths = function(ar) {
+        _paths = ar;
+        return _paths;
     };
 
     // Creates a function that always
