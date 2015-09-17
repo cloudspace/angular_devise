@@ -10,10 +10,15 @@ Requirements
 This service requires Devise to respond to JSON. To do that, simply add
 
 ```ruby
-# app/controllers/application_controller.rb
-class ApplicationController < ActionController::Base
-  respond_to :html, :json
-  # ...
+# config/application.rb
+module RailsApp
+  class Application < Rails::Application
+    # ...
+
+    config.to_prepare do
+      DeviseController.respond_to :html, :json
+    end
+  end
 end
 ```
 
