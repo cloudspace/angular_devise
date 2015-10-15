@@ -532,6 +532,9 @@ By default, AngularDevise uses the following HTTP methods/paths:
 | login    | POST        | /users/sign_in.json  |
 | logout   | DELETE      | /users/sign_out.json |
 | register | POST        | /users.json          |
+| update   | PUT         | /users.json          |
+| sendResetPasswordInstructions | POST | /users/password.json |
+| resetPassword | POST   | /users/password.json |
 
 All credentials will be under the `users` namespace, and the following
 parse function will be used to parse the response:
