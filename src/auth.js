@@ -5,7 +5,6 @@ devise.provider('Auth', function AuthProvider() {
     var paths = {
         login: '/users/sign_in.json',
         logout: '/users/sign_out.json',
-        update: '/users.json',
         register: '/users.json',
         sendResetPasswordInstructions: '/users/password.json',
         resetPassword: '/users/password.json'
@@ -17,7 +16,6 @@ devise.provider('Auth', function AuthProvider() {
     var methods = {
         login: 'POST',
         logout: 'DELETE',
-        update: 'PUT',
         register: 'POST',
         sendResetPasswordInstructions: 'POST',
         resetPassword: 'PUT'
@@ -258,8 +256,7 @@ devise.provider('Auth', function AuthProvider() {
 
             /**
              * A function to send the reset password instructions to the
-             * user email. Keep in mind, credentials are sent
-             * in plaintext; use a SSL connection to secure them.
+             * user email.
              * By default, `sendResetPasswordInstructions` will POST to '/users/password.json'.
              *
              * The path and HTTP method used to send instructions are configurable
@@ -275,19 +272,16 @@ devise.provider('Auth', function AuthProvider() {
              * @returns {Promise} A $http promise that will be resolved or
              *                  rejected by the server.
              */
-            update: function(creds) {
+            sendResetPasswordInstructions: function(creds) {
                 creds = creds || {};
-                return $http(httpConfig('update', {user: creds}))
+                return $http(httpConfig('sendResetPasswordInstructions', {user: creds}))
                     .then(service.parse)
-                    .then(save)
-                    .then(broadcast('update-successfully'));
+                    .then(broadcast('send-reset-password-instructions-successfully'));
             },
 
             /**
              * A reset function to reset user password.
-             * Keep in mind, credentials are sent
-             * in plaintext; use a SSL connection to secure them.
-             * By default, `update` will PUT to '/users/password.json'.
+             * By default, `resetPassword` will PUT to '/users/password.json'.
              *
              * The path and HTTP method used to reset password are configurable
              * using
@@ -299,32 +293,6 @@ devise.provider('Auth', function AuthProvider() {
              *  });
              *
              * @param {Object} [creds] A hash containing password, password_confirmation and reset_password_token.
-             * @returns {Promise} A $http promise that will be resolved or
-             *                  rejected by the server.
-             */
-            sendResetPasswordInstructions: function(creds) {
-                creds = creds || {};
-                return $http(httpConfig('sendResetPasswordInstructions', {user: creds}))
-                    .then(service.parse)
-                    .then(broadcast('send-reset-password-instructions-successfully'));
-            },
-
-            /**
-             * A update function to update user data
-             * with the server. Keep in mind, credentials are sent
-             * in plaintext; use a SSL connection to secure them.
-             * By default, `update` will PUT to '/users.json'.
-             *
-             * The path and HTTP method used to login are configurable
-             * using
-             *
-             *  angular.module('myModule', ['Devise']).
-             *  config(function(AuthProvider) {
-             *      AuthProvider.updatePath('path/on/server.json');
-             *      AuthProvider.updateMethod('PUT');
-             *  });
-             *
-             * @param {Object} [creds] A hash of user credentials.
              * @returns {Promise} A $http promise that will be resolved or
              *                  rejected by the server.
              */
