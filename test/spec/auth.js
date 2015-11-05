@@ -393,7 +393,7 @@ describe('Provider: Devise.Auth', function () {
         it('POSTs email data', function() {
             var u = {user: {email: 'new_email'}};
             postCallback = function(data) {
-                return jsonEquals(data.user.user, u);
+                return jsonEquals(data.user, u);
             };
             Auth.sendResetPasswordInstructions(u);
             $httpBackend.flush();
@@ -442,7 +442,7 @@ describe('Provider: Devise.Auth', function () {
         it('PUTs updated data', function() {
             var u = {user: {password: 'new_password', password_confirmation: 'new_password', reset_password_token: 'token'}};
             postCallback = function(data) {
-                return jsonEquals(data.user.user, u);
+                return jsonEquals(data.user, u);
             };
             Auth.resetPassword(u);
             $httpBackend.flush();
