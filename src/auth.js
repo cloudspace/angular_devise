@@ -274,7 +274,7 @@ devise.provider('Auth', function AuthProvider() {
              */
             sendResetPasswordInstructions: function(creds) {
                 creds = creds || {};
-                return $http(httpConfig('sendResetPasswordInstructions', {user: creds}))
+                return $http(httpConfig('sendResetPasswordInstructions', creds))
                     .then(service.parse)
                     .then(broadcast('send-reset-password-instructions-successfully'));
             },
@@ -298,7 +298,7 @@ devise.provider('Auth', function AuthProvider() {
              */
             resetPassword: function(creds) {
                 creds = creds || {};
-                return $http(httpConfig('resetPassword', {user: creds}))
+                return $http(httpConfig('resetPassword', creds))
                     .then(service.parse)
                     .then(save)
                     .then(broadcast('reset-password-successfully'));
