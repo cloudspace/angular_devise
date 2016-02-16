@@ -1,6 +1,5 @@
 {
   "name": "AngularDevise",
-  "version": "1.1.0",
   "main": "lib/devise.js",
   "ignore": [
     "**/.*",
