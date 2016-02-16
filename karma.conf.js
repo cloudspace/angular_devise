@@ -6,6 +6,8 @@ module.exports = function(config) {
         // testing framework to use (jasmine/mocha/qunit/...)
         frameworks: ['jasmine'],
 
+        plugins : ['karma-jasmine', 'karma-phantomjs-launcher'],
+
         // list of files / patterns to load in the browser
         files: [
             'test/support/angular/angular.js',
