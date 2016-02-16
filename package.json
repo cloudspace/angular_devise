@@ -34,6 +34,7 @@
     "karma-jasmine": "^0.3.7",
     "karma-phantomjs-launcher": "^1.0.0",
     "load-grunt-tasks": "~0.2.0",
+    "phantomjs-prebuilt": "^2.1.4",
     "time-grunt": "~0.2.1"
   }
 }
