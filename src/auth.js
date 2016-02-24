@@ -321,7 +321,7 @@ devise.provider('Auth', function AuthProvider() {
                 if (service.isAuthenticated()) {
                     return $q.when(service._currentUser);
                 }
-                if(service._promise == null){
+                if(service._promise === null){
                     service._promise = service.login();
                 }
                 return service._promise;
