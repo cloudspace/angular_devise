@@ -21,6 +21,7 @@ devise.provider('AuthIntercept', function AuthInterceptProvider() {
                 if (intercept && response.status === 401) {
                     var deferred = $q.defer();
                     $rootScope.$broadcast('devise:unauthorized', response, deferred);
+                    deferred.reject(response);
                     return deferred.promise;
                 }
 
