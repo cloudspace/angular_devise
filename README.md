@@ -75,6 +75,11 @@ angular.module('myModule', ['Devise']).
     });
 ```
 
+### Auth.setBaseUrl(string)
+
+`Auth.setBaseUrl()` sets the base url for your calls. This is needed
+for applications that use separet servers for both the front and back end
+
 ### Auth.currentUser()
 
 `Auth.currentUser()` returns a promise that will be resolved into the
