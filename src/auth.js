@@ -48,9 +48,10 @@ devise.provider('Auth', function AuthProvider() {
     // A helper function that will setup the ajax config
     // and merge the data key if provided
     function httpConfig(action, data, additionalConfig) {
+        additionalConfig.baseUrl = additionalConfig.baseUrl || '';
         var config = {
             method: methods[action].toLowerCase(),
-            url: paths[action]
+            url: additionalConfig.baseUrl+''+paths[action]
         };
 
         if (data) {
@@ -151,6 +152,12 @@ devise.provider('Auth', function AuthProvider() {
              */
             _promise: null,
 
+            _baseUrl: '',
+
+            setBaseUrl: function(baseUrl) {
+                service._baseUrl = baseUrl;
+            },
+
             /* reset promise and current_user, after call this method all
              * xhr request will be reprocessed when they will be call
              */
@@ -186,6 +193,8 @@ devise.provider('Auth', function AuthProvider() {
                     loggedIn = service.isAuthenticated();
 
                 creds = creds || {};
+                config = config || {};
+                config.baseUrl = service._baseUrl || '';
                 return $http(httpConfig('login', creds, config))
                     .then(service.parse)
                     .then(save)
@@ -217,6 +226,8 @@ devise.provider('Auth', function AuthProvider() {
              *                  rejected by the server.
              */
             logout: function(config) {
+                config = config || {};
+                config.baseUrl = service._baseUrl || '';
                 var returnOldUser = constant(service._currentUser);
                 return $http(httpConfig('logout', undefined, config))
                     .then(reset)
@@ -248,6 +259,8 @@ devise.provider('Auth', function AuthProvider() {
              */
             register: function(creds, config) {
                 creds = creds || {};
+                config = config || {};
+                config.baseUrl = service._baseUrl || '';
                 return $http(httpConfig('register', creds, config))
                     .then(service.parse)
                     .then(save)
@@ -272,9 +285,11 @@ devise.provider('Auth', function AuthProvider() {
              * @returns {Promise} A $http promise that will be resolved or
              *                  rejected by the server.
              */
-            sendResetPasswordInstructions: function(creds) {
+            sendResetPasswordInstructions: function(creds, config) {
                 creds = creds || {};
-                return $http(httpConfig('sendResetPasswordInstructions', creds))
+                config = config || {};
+                config.baseUrl = service._baseUrl || '';
+                return $http(httpConfig('sendResetPasswordInstructions', creds, config))
                     .then(service.parse)
                     .then(broadcast('send-reset-password-instructions-successfully'));
             },
@@ -296,9 +311,11 @@ devise.provider('Auth', function AuthProvider() {
              * @returns {Promise} A $http promise that will be resolved or
              *                  rejected by the server.
              */
-            resetPassword: function(creds) {
+            resetPassword: function(creds, config) {
                 creds = creds || {};
-                return $http(httpConfig('resetPassword', creds))
+                config = config || {};
+                config.baseUrl = service._baseUrl || '';
+                return $http(httpConfig('resetPassword', creds, config))
                     .then(service.parse)
                     .then(save)
                     .then(broadcast('reset-password-successfully'));
