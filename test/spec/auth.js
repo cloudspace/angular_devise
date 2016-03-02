@@ -115,6 +115,14 @@ describe('Provider: Devise.Auth', function () {
             expect(callCount).toBe(1);
         });
 
+        it('.baseUrl', function() {
+            var baseUrl = 'http://localhost:3000';
+            initService(function() {
+              AuthProvider.baseUrl(baseUrl);
+            });
+            expect(AuthProvider.baseUrl()).toEqual(baseUrl);
+        });
+
         describe('.resourceName', function() {
             var credentials = {test: 'test'};
             afterEach(function() {
