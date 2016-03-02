@@ -1,4 +1,5 @@
 devise.provider('Auth', function AuthProvider() {
+    var _baseUrl = '';
     /**
      * The default paths.
      */
@@ -51,7 +52,7 @@ devise.provider('Auth', function AuthProvider() {
         additionalConfig.baseUrl = additionalConfig.baseUrl || '';
         var config = {
             method: methods[action].toLowerCase(),
-            url: additionalConfig.baseUrl+''+paths[action]
+            url: _baseUrl+''+additionalConfig.baseUrl+''+paths[action]
         };
 
         if (data) {
@@ -100,6 +101,10 @@ devise.provider('Auth', function AuthProvider() {
         }
         _parse = fn;
         return this;
+    };
+
+    this.setBaseUrl = function(url) {
+        _baseUrl = url;
     };
 
     // Creates a function that always
@@ -151,12 +156,6 @@ devise.provider('Auth', function AuthProvider() {
              * on the scope.
              */
             _promise: null,
-
-            _baseUrl: '',
-
-            setBaseUrl: function(baseUrl) {
-                service._baseUrl = baseUrl;
-            },
 
             /* reset promise and current_user, after call this method all
              * xhr request will be reprocessed when they will be call

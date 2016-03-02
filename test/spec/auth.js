@@ -91,11 +91,6 @@ describe('Provider: Devise.Auth', function () {
             testPathConfigure('resetPassword', 'GET', true);
         });
 
-        it('setBaseUrl', function() {
-            Auth.setBaseUrl('NewBaseUrl');
-            expect(Auth._baseUrl).toBe('NewBaseUrl');
-        });
-
         it('.parse', function() {
             initService(function() {
                 AuthProvider.parse(function(response) {
