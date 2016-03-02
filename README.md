@@ -529,6 +529,10 @@ angular.module('myModule', ['Devise']).
         // Pass false to disable the namespace altogether.
         AuthProvider.resourceName('customer');
 
+        // Also you can change host URL for backend calls
+        // (for example if it's on another server than your angular app)
+        AuthProvier.baseUrl('http://localhost:3000');
+
         // Customize user parsing
         // NOTE: **MUST** return a truth-y expression
         AuthProvider.parse(function(response) {
