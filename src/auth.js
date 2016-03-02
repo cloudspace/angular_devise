@@ -49,10 +49,9 @@ devise.provider('Auth', function AuthProvider() {
     // A helper function that will setup the ajax config
     // and merge the data key if provided
     function httpConfig(action, data, additionalConfig) {
-        additionalConfig.baseUrl = additionalConfig.baseUrl || '';
         var config = {
             method: methods[action].toLowerCase(),
-            url: _baseUrl+''+additionalConfig.baseUrl+''+paths[action]
+            url: _baseUrl+''+paths[action]
         };
 
         if (data) {
@@ -193,7 +192,6 @@ devise.provider('Auth', function AuthProvider() {
 
                 creds = creds || {};
                 config = config || {};
-                config.baseUrl = service._baseUrl || '';
                 return $http(httpConfig('login', creds, config))
                     .then(service.parse)
                     .then(save)
@@ -226,7 +224,6 @@ devise.provider('Auth', function AuthProvider() {
              */
             logout: function(config) {
                 config = config || {};
-                config.baseUrl = service._baseUrl || '';
                 var returnOldUser = constant(service._currentUser);
                 return $http(httpConfig('logout', undefined, config))
                     .then(reset)
@@ -259,7 +256,6 @@ devise.provider('Auth', function AuthProvider() {
             register: function(creds, config) {
                 creds = creds || {};
                 config = config || {};
-                config.baseUrl = service._baseUrl || '';
                 return $http(httpConfig('register', creds, config))
                     .then(service.parse)
                     .then(save)
@@ -287,7 +283,6 @@ devise.provider('Auth', function AuthProvider() {
             sendResetPasswordInstructions: function(creds, config) {
                 creds = creds || {};
                 config = config || {};
-                config.baseUrl = service._baseUrl || '';
                 return $http(httpConfig('sendResetPasswordInstructions', creds, config))
                     .then(service.parse)
                     .then(broadcast('send-reset-password-instructions-successfully'));
@@ -313,7 +308,6 @@ devise.provider('Auth', function AuthProvider() {
             resetPassword: function(creds, config) {
                 creds = creds || {};
                 config = config || {};
-                config.baseUrl = service._baseUrl || '';
                 return $http(httpConfig('resetPassword', creds, config))
                     .then(service.parse)
                     .then(save)
