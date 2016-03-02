@@ -75,9 +75,9 @@ angular.module('myModule', ['Devise']).
     });
 ```
 
-### Auth.setBaseUrl(string)
+### AuthProvider.setBaseUrl(string)
 
-`Auth.setBaseUrl()` sets the base url for your calls. This is needed
+When calling `AuthProvider.setBaseUrl()` in your config module's function, it sets the base url for your calls. This is needed
 for applications that use separet servers for both the front and back end
 
 ### Auth.currentUser()
