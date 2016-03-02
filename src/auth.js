@@ -22,6 +22,11 @@ devise.provider('Auth', function AuthProvider() {
     };
 
     /**
+     * The default host URL.
+     */
+    var baseUrl = '';
+
+    /**
      * Default devise resource_name is 'user', can be set to any string.
      * If it's falsey, it will not namespace the data.
      */
@@ -82,6 +87,15 @@ devise.provider('Auth', function AuthProvider() {
     }
     configure.call(this, methods, 'Method');
     configure.call(this, paths, 'Path');
+
+    // The baseUrl config function
+    this.baseUrl = function(value) {
+      if (value === undefined) {
+          return baseUrl;
+      }
+      baseUrl = value;
+      return this;
+    };
 
     // The resourceName config function
     this.resourceName = function(value) {
