@@ -331,12 +331,12 @@ devise.provider('Auth', function AuthProvider() {
              * @returns {Promise} A $http promise that will be resolved or
              *                  rejected by the server.
              */
-            currentUser: function() {
+            currentUser: function(config) {
                 if (service.isAuthenticated()) {
                     return $q.when(service._currentUser);
                 }
                 if(service._promise === null){
-                    service._promise = service.login();
+                    service._promise = service.login({}, config);
                 }
                 return service._promise;
             },
