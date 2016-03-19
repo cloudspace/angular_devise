@@ -22,7 +22,7 @@ module RailsApp
 end
 ```
 
-Aditionally, if you have [CSRF Forgery
+Additionally, if you have [CSRF Forgery
 Protection](http://api.rubyonrails.org/classes/ActionController/RequestForgeryProtection/ClassMethods.html)
 enabled for your controller actions, you will also need to include the
 `X-CSRF-TOKEN` header with the token provided by rails. The easiest way
