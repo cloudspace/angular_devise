@@ -120,6 +120,15 @@ angular.module('myModule', ['Devise']).
     });
 ```
 
+### Auth.reset()
+`Auth.reset()` resets promise and current_user, and then calls `Auth.currentUser()`.
+
+```javascript
+angular.module('myModule', ['Devise']).
+    controller('myCtrl', function(Auth) {
+        Auth.reset();
+    });
+```
 
 ### Auth.isAuthenticated()
 
