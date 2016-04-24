@@ -286,9 +286,9 @@ devise.provider('Auth', function AuthProvider() {
              * @returns {Promise} A $http promise that will be resolved or
              *                  rejected by the server.
              */
-            sendResetPasswordInstructions: function(creds) {
+            sendResetPasswordInstructions: function(creds, config) {
                 creds = creds || {};
-                return $http(httpConfig('sendResetPasswordInstructions', creds))
+                return $http(httpConfig('sendResetPasswordInstructions', creds, config))
                     .then(service.parse)
                     .then(broadcast('send-reset-password-instructions-successfully'));
             },
