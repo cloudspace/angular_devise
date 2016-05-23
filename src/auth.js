@@ -53,9 +53,10 @@ devise.provider('Auth', function AuthProvider() {
     // A helper function that will setup the ajax config
     // and merge the data key if provided
     function httpConfig(action, data, additionalConfig) {
+        var url = baseUrl + paths[action];
         var config = {
             method: methods[action].toLowerCase(),
-            url: paths[action]
+            url: url
         };
 
         if (data) {
@@ -90,11 +91,11 @@ devise.provider('Auth', function AuthProvider() {
 
     // The baseUrl config function
     this.baseUrl = function(value) {
-      if (value === undefined) {
-          return baseUrl;
-      }
-      baseUrl = value;
-      return this;
+        if (value === undefined) {
+            return baseUrl;
+        }
+        baseUrl = value;
+        return this;
     };
 
     // The resourceName config function
