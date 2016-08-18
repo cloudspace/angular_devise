@@ -90,11 +90,11 @@ devise.provider('Auth', function AuthProvider() {
 
     // The baseUrl config function
     this.baseUrl = function(value) {
-      if (value === undefined) {
-          return baseUrl;
-      }
-      baseUrl = value;
-      return this;
+        if (value === undefined) {
+            return baseUrl;
+        }
+        baseUrl = value;
+        return this;
     };
 
     // The resourceName config function
