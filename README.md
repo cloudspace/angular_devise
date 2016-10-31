@@ -87,7 +87,7 @@ currentUser. There are three possible outcomes:
     be broadcast with the current user as the argument.
  3. Neither Auth nor the server has an authenticated session, and a
     rejected promise will be returned. (see [Interceptor](#interceptor)
-    for for custom handling.)
+    for custom handling.)
 
 ```javascript
 angular.module('myModule', ['Devise']).
