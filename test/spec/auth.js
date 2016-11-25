@@ -374,7 +374,6 @@ describe('Provider: Devise.Auth', function () {
     });
 
     describe('.sendResetPasswordInstructions', function() {
-        var user;
         var postCallback;
         function constantTrue() {
             return true;
