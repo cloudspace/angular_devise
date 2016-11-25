@@ -30,6 +30,14 @@ to include this is to follow this post:
 
 [angular_rails_csrf](http://stackoverflow.com/questions/14734243/rails-csrf-protection-angular-js-protect-from-forgery-makes-me-to-log-out-on).
 
+Or if you do not want install any gems, you can do something like:
+
+```javascript
+app.config(function($httpProvider) {
+   token = $("meta[name=\"csrf-token\"]").attr("content")
+   $httpProvider.defaults.headers.common["X-CSRF-TOKEN"] = token
+})
+```
 Downloading
 -----------
 
