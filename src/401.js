@@ -14,8 +14,11 @@ devise.provider('AuthIntercept', function AuthInterceptProvider() {
         // Only for intercepting 401 requests.
         return {
             responseError: function(response) {
+                var intercept;
                 // Determine if the response is specifically disabling the interceptor.
-                var intercept = response.config.interceptAuth;
+                if (response.config) {
+                    intercept = response.config.interceptAuth;
+                }
                 intercept = !!intercept || (interceptAuth && intercept === void 0);
 
                 if (intercept && response.status === 401) {
